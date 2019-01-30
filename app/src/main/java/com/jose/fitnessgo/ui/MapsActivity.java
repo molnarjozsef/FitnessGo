@@ -237,6 +237,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btnClaimPoints.setEnabled(true);
     }
 
+
+    /**
+     * A BroadcastReceiver for the Proximity alert PendingIntent
+     */
     public class AlertOnProximityReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(final Context context, final Intent intent) {
