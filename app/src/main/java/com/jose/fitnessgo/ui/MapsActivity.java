@@ -49,7 +49,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private TextView tvTargetAddress;
     private TextView tvUserPoints;
     private Integer distanceInMeters;
-    private long startTime = System.currentTimeMillis();
+    private long startTimeOfRound = System.currentTimeMillis();
     private AlertOnProximityReceiver pxr;
     private Intent intent;
     private PendingIntent proxIntent;
@@ -148,17 +148,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 userLocation = task.getResult();
             }
             if(userLocation.distanceTo(targetLocation) < EXPECTED_RANGE_TO_TARGET){
-                //Todo: fails at midnight
-                long timeTaken = System.currentTimeMillis()-startTime;
-                double userPoints = (float) Integer.parseInt(tvUserPoints.getText()
-                        .toString().replaceAll("[\\D]", ""));
-                double earnedPoints = (distanceInMeters*1000/(Math.sqrt(timeTaken)));
-                int newPoints = (int)(userPoints + earnedPoints);
+                int newPoints = calculateNewPoints();
                 tvUserPoints.setText(newPoints + " points");
-                //getLastKnownLocation(true);
-                btnClaimPoints.setEnabled(false);
             }else{
-                Toast.makeText(MapsActivity.this,"Not close enough.",Toast.LENGTH_LONG).show();
+                Toast.makeText(MapsActivity.this,
+                        getString(R.string.not_close_enough)+"\n"+
+                                (int) userLocation.distanceTo(targetLocation)+" "+
+                                getString(R.string._meters_still_to_go),
+                        Toast.LENGTH_LONG).show();
             }
         }
     };
@@ -188,7 +185,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         try {
             List<Address> addresses = geocoder.
                     getFromLocation(targetLatLng.latitude, targetLatLng.longitude, 1);
-            tvTargetAddress.setText(addresses.get(0).getAddressLine(0).toString());
+            tvTargetAddress.setText(addresses.get(0).getAddressLine(0));
 
             targetLatLng = new LatLng(addresses.get(0).getLatitude(), addresses.get(0).getLongitude());
 
@@ -196,21 +193,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             e.printStackTrace();
         }
 
-        // Add a marker to the generated target point and move the camera
-        mMap.clear();
-        mMap.addMarker(new MarkerOptions().position(targetLatLng)
-                .title("This is where you should get, as fast as you can"));
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(targetLatLng));
-
         // Measuring the starting distance to the target
         targetLocation.setLatitude(targetLatLng.latitude);
         targetLocation.setLongitude(targetLatLng.longitude);
         distanceInMeters = (int) userLocation.distanceTo(targetLocation);
-        tvTargetAddress.append("\n" + distanceInMeters.toString() + " meters away");
+        tvTargetAddress.append("\n" + getString(R.string.this_round_is) + " "
+                + distanceInMeters.toString() + " "+ getString(R.string.meters));
 
-        startTime = System.currentTimeMillis();
+        startTimeOfRound = System.currentTimeMillis();
 
-        // Proximity Alert
+        // Building the Proximity Alert
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         intent = new Intent("com.jose.fitnessgo.ProximityAlert");
         proxIntent = PendingIntent
@@ -223,10 +215,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return;
         }
         lm.removeProximityAlert(proxIntent);
-        lm.addProximityAlert(targetLatLng.latitude, targetLatLng.longitude, 100f, -1, proxIntent);
+        lm.addProximityAlert(
+                targetLatLng.latitude,
+                targetLatLng.longitude,
+                100f,
+                -1,
+                proxIntent);
 
 
-
+        // Updating the map with the new location
+        // And refocusing the view between the user and the target
+        mMap.clear();
+        mMap.addMarker(new MarkerOptions().position(targetLatLng)
+                .title("This is where you should get, as fast as you can"));
         mMap.animateCamera(CameraUpdateFactory
                 .newLatLngZoom(new LatLng(
                         (targetLocation.getLatitude() + userLocation.getLatitude())/2,
@@ -234,9 +235,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         16.0f));
 
 
+        // Re-enabling the Claim Points button, because the new location's points were not yet claimed
         btnClaimPoints.setEnabled(true);
     }
 
+
+    /**
+     * This function should be called when the user gets to the target location
+     * It calculates the earned points, and gives it back
+     */
+    int calculateNewPoints(){
+
+        //Todo: fails at midnight
+        long timeTaken = System.currentTimeMillis()- startTimeOfRound;
+        double userPoints = (float) Integer.parseInt(tvUserPoints.getText()
+                .toString().replaceAll("[\\D]", ""));
+        double earnedPoints = (distanceInMeters*5-(timeTaken/1000));
+        if(earnedPoints < 10) {
+            earnedPoints = 0;
+        }
+
+        //Disabling the Claim Points button, because the points were already given to the user
+        btnClaimPoints.setEnabled(false);
+        return (int)(userPoints + earnedPoints);
+    }
 
     /**
      * A BroadcastReceiver for the Proximity alert PendingIntent
@@ -245,15 +267,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         public void onReceive(final Context context, final Intent intent) {
 
+
             tvTargetAddress.append("\n\n Destination reached!");
-            long timeTaken = System.currentTimeMillis()-startTime;
-            double userPoints = (float) Integer.parseInt(tvUserPoints.getText()
-                    .toString().replaceAll("[\\D]", ""));
-            double earnedPoints = (distanceInMeters*1000/(Math.sqrt(timeTaken)));
-            int newPoints = (int)(userPoints + earnedPoints);
+            int newPoints = calculateNewPoints();
             tvUserPoints.setText(newPoints + " points");
-            //getLastKnownLocation(true);
-            btnClaimPoints.setEnabled(false);
         }
     }
 }

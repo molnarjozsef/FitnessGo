@@ -101,6 +101,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Opens an alert message that tells the user to enable GPS,
+     * and opens the GPS enabling system settings menu
+     */
     private void buildAlertMessageNoGps() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("This application requires GPS to work at all, do you want to enable it?")
