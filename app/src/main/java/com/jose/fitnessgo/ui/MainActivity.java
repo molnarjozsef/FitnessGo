@@ -22,8 +22,8 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.jose.fitnessgo.R;
 
-import static com.jose.fitnessgo.util.Constants.ERROR_DIALOG_REQUEST;
-import static com.jose.fitnessgo.util.Constants.PERMISSIONS_REQUEST_FINE_LOCATION;
+import static com.jose.fitnessgo.Constants.ERROR_DIALOG_REQUEST;
+import static com.jose.fitnessgo.Constants.PERMISSIONS_REQUEST_FINE_LOCATION;
 
 public class MainActivity extends AppCompatActivity {
 

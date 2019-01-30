@@ -1,4 +1,4 @@
-package com.jose.fitnessgo.util;
+package com.jose.fitnessgo;
 
 public class Constants {
 
