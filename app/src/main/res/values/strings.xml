@@ -9,6 +9,8 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
     <string name="not_close_enough">Not close enough.</string>
     <string name="_meters_still_to_go">meters still to go!</string>
     <string name="meters_from_start_pos">meters away from the start</string>
@@ -20,4 +22,8 @@
     <string name="_0_points">0 points</string>
     <string name="generate_new_target_btn">New target</string>
     <string name="claim_points_btn">Claim points</string>
+
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>

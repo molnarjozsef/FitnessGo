@@ -8,23 +8,69 @@ import android.location.LocationManager
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
+import android.support.v4.view.GravityCompat
+import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.jose.fitnessgo.Constants.ERROR_DIALOG_REQUEST
 import com.jose.fitnessgo.Constants.PERMISSIONS_REQUEST_FINE_LOCATION
-import com.jose.fitnessgo.R
-import kotlinx.android.synthetic.main.activity_home.*
+import kotlinx.android.synthetic.main.activity_main.*
+
+
 
 class MainActivity : AppCompatActivity() {
 
 
     // Variables
     private val mLocationPermissionGranted = false
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(com.jose.fitnessgo.R.layout.activity_main)
+        val toolbar = findViewById<Toolbar>(com.jose.fitnessgo.R.id.toolbar)
+        setSupportActionBar(toolbar)
+
+        val toggle = ActionBarDrawerToggle(this, drawer_layout, toolbar,
+                com.jose.fitnessgo.R.string.navigation_drawer_open, com.jose.fitnessgo.R.string.navigation_drawer_close)
+        drawer_layout.addDrawerListener(toggle)
+        toggle.syncState()
+
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction().replace(com.jose.fitnessgo.R.id.fragment_container,
+                    HomeFragment()).commit()
+            //navigationView.setCheckedItem(com.jose.fitnessgo.R.id.nav_message)
+        }
+
+        fun onClick(v: View){
+            val intent = Intent(this, MapsActivity::class.java)
+            startActivity(intent)
+        }
+
+        /*
+        bankcardId.setOnClickListener {
+            val intent = Intent(this, MapsActivity::class.java)
+            startActivity(intent)
+        }
+        */
+
+
+
+
+    }
+
+    override fun onBackPressed(){
+        if(drawer_layout.isDrawerOpen(GravityCompat.START)){
+            drawer_layout.closeDrawer(GravityCompat.START)
+        }else{
+            super.onBackPressed()
+        }
+    }
 
 
     /**
@@ -69,35 +115,14 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home)
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
-
-        bankcardId.setOnClickListener {
-            val intent = Intent(this@MainActivity, MapsActivity::class.java)
-            startActivity(intent)
-        }
-
-        /*
-        val layoutManager = LinearLayoutManager(this)
-        layoutManager.orientation = LinearLayoutManager.VERTICAL
-        recyclerView.layoutManager = layoutManager
-
-        val adapter = MenuItemAdapter(this, Supplier.menuItems)
-        recyclerView.adapter = adapter
-        */
-
-
-    }
 
     override fun onResume() {
         super.onResume()
-
+/*
         isServicesOK
         isMapsEnabled
         checkRequestLocationPermission()
+  */
     }
 
     /**
