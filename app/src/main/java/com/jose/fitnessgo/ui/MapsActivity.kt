@@ -35,8 +35,6 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
     private var targetLatLng: LatLng? = null
     private var userLocation: Location = Location(LocationManager.GPS_PROVIDER)
     private var mFusedLocationProviderClient: FusedLocationProviderClient? = null
-    //private var tvTargetAddress: TextView? = null
-    //private var tvUserPoints: TextView? = null
     private var distanceInMeters: Int = 1000000
     private var startTimeOfRound = System.currentTimeMillis()
     private var pxr: AlertOnProximityReceiver? = null

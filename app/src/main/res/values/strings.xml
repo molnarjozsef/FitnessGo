@@ -18,6 +18,6 @@
     <string name="this_round_is">This round is</string>
     <string name="_points">%1$d points</string>
     <string name="_0_points">0 points</string>
-    <string name="generate_new_target_btn">Gergő gomb</string>
+    <string name="generate_new_target_btn">New target</string>
     <string name="claim_points_btn">Claim points</string>
 </resources>
