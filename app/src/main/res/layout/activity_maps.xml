@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="0 points"
+            android:text="@string/_0_points"
             android:textSize="18sp"
             android:layout_weight="45"/>
 
@@ -39,13 +39,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="10"
-                android:text="Gergő gomb" />
+                android:text="@string/generate_new_target_btn" />
             <Button
                 android:id="@+id/btnClaimPoints"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="10"
-                android:text="Claim points" />
+                android:text="@string/claim_points_btn" />
 
         </LinearLayout>
 
