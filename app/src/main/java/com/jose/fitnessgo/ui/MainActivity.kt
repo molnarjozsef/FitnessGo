@@ -62,6 +62,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
+
     }
 
     override fun onBackPressed(){
@@ -117,11 +118,13 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onResume() {
-        super.onResume()
-/*
+
         isServicesOK
         isMapsEnabled
         checkRequestLocationPermission()
+        
+        super.onResume()
+/*
   */
     }
 
