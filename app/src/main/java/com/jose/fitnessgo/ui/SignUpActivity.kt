@@ -29,30 +29,30 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     fun registerUser(){
-        val email = etEmail.text.toString().trim()
-        val password = etPassword.text.toString().trim()
+        val email = etEmailSignUp.text.toString().trim()
+        val password = etPasswordSignUp.text.toString().trim()
 
         if(email.isEmpty()){
-            etEmail.setError("Email is required")
-            etEmail.requestFocus()
+            etEmailSignUp.setError("Email is required")
+            etEmailSignUp.requestFocus()
             return
         }
 
         if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
-            etEmail.setError("Please enter a valid email")
-            etEmail.requestFocus()
+            etEmailSignUp.setError("Please enter a valid email")
+            etEmailSignUp.requestFocus()
             return
         }
 
         if(password.isEmpty()){
-            etPassword.setError("Password is required")
-            etPassword.requestFocus()
+            etPasswordSignUp.setError("Password is required")
+            etPasswordSignUp.requestFocus()
             return
         }
 
         if(password.length < 8){
-            etPassword.setError("Password is required")
-            etPassword.requestFocus()
+            etPasswordSignUp.setError("Password is required")
+            etPasswordSignUp.requestFocus()
             return
         }
 
@@ -60,17 +60,12 @@ class SignUpActivity : AppCompatActivity() {
 
         mAuth?.createUserWithEmailAndPassword(email,password)
                 ?.addOnSuccessListener {
-                    Toast.makeText(this, "User registered successfully", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Registration successful", Toast.LENGTH_LONG).show()
                     pbSignUp.visibility = View.GONE
         }
                 ?.addOnFailureListener {
                     Toast.makeText(this, "Registration unsuccessful: " +
-                            "${it.toString().subSequence(
-                                    // Trims the type of the exception,
-                                    // so that only the description remains
-                                    it.toString().indexOf(':') + 2,
-                                    it.toString().length)
-                            }", Toast.LENGTH_LONG).show()
+                            "${it.message}", Toast.LENGTH_LONG).show()
                     pbSignUp.visibility = View.GONE
         }
 

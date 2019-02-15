@@ -14,14 +14,14 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
-import android.view.View
 import android.widget.Toast
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
+import com.google.firebase.auth.FirebaseAuth
 import com.jose.fitnessgo.Constants.ERROR_DIALOG_REQUEST
 import com.jose.fitnessgo.Constants.PERMISSIONS_REQUEST_FINE_LOCATION
 import kotlinx.android.synthetic.main.activity_main.*
-
+import kotlinx.android.synthetic.main.nav_header.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -47,17 +47,7 @@ class MainActivity : AppCompatActivity() {
             //navigationView.setCheckedItem(com.jose.fitnessgo.R.id.nav_message)
         }
 
-        fun onClick(v: View){
-            val intent = Intent(this, MapsActivity::class.java)
-            startActivity(intent)
-        }
 
-        /*
-        bankcardId.setOnClickListener {
-            val intent = Intent(this, MapsActivity::class.java)
-            startActivity(intent)
-        }
-        */
 
 
 
@@ -122,10 +112,11 @@ class MainActivity : AppCompatActivity() {
         isServicesOK
         isMapsEnabled
         checkRequestLocationPermission()
-        
+
+        val mAuth = FirebaseAuth.getInstance()
+        tvUserEmail?.text = mAuth.currentUser?.email.toString()
+
         super.onResume()
-/*
-  */
     }
 
     /**
