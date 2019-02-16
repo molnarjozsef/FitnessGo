@@ -45,6 +45,7 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
     private var proxPendIntent: PendingIntent? = null
     private val targetLocation = Location(LocationManager.GPS_PROVIDER)
     private var db: FirebaseFirestore? = null
+    private var userPoints: Int = 0
 
     /**
      * OnCompleteListener for the getLastKnownLocation function,
@@ -141,6 +142,14 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
         val filter = IntentFilter("com.jose.fitnessgo.ProximityAlert")
         pxr = AlertOnProximityReceiver()
         registerReceiver(pxr, filter)
+    }
+
+
+    /**
+     * Updates the TextView that shows the user points from the Integer parameter
+     */
+    fun refreshUserPointsView(pts: Int){
+        tvUserPoints.text = pts.toString() + " points"
     }
 
 
@@ -269,7 +278,8 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
 
             tvTargetAddress.append("\n\n Destination reached!")
             val newPoints = calculateNewPoints()
-            tvUserPoints.text = newPoints.toString() + " points"
+            refreshUserPointsView(newPoints)
+            //tvUserPoints.text = newPoints.toString() + " points"
         }
     }
 
