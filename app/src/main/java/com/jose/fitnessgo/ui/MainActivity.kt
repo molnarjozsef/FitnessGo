@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Bundle
+import android.support.design.widget.NavigationView
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
@@ -14,14 +15,16 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
+import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.auth.FirebaseAuth
 import com.jose.fitnessgo.Constants.ERROR_DIALOG_REQUEST
 import com.jose.fitnessgo.Constants.PERMISSIONS_REQUEST_FINE_LOCATION
+import com.jose.fitnessgo.R
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.nav_header.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -47,10 +50,11 @@ class MainActivity : AppCompatActivity() {
             //navigationView.setCheckedItem(com.jose.fitnessgo.R.id.nav_message)
         }
 
-
-
-
-
+        val mAuth = FirebaseAuth.getInstance()
+        val navigationView: NavigationView = findViewById(R.id.nav_view);
+        val headerview: View = navigationView.getHeaderView(0);
+        val profileEmail: TextView = headerview.findViewById(R.id.tvUserEmail);
+        profileEmail.text = mAuth.currentUser?.email.toString()
 
 
     }
@@ -113,11 +117,13 @@ class MainActivity : AppCompatActivity() {
         isMapsEnabled
         checkRequestLocationPermission()
 
-        val mAuth = FirebaseAuth.getInstance()
-        tvUserEmail?.text = mAuth.currentUser?.email.toString()
+
+
 
         super.onResume()
     }
+
+
 
     /**
      * Checks for fine location access permission, and requests if not yet granted
