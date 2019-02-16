@@ -24,10 +24,13 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.jose.fitnessgo.R
 import kotlinx.android.synthetic.main.activity_maps.*
 import java.io.IOException
 import java.util.*
+import kotlin.collections.HashMap
 
 class MapsActivity : FragmentActivity(), OnMapReadyCallback {
 
@@ -41,6 +44,7 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
     private var proxIntent: Intent? = null
     private var proxPendIntent: PendingIntent? = null
     private val targetLocation = Location(LocationManager.GPS_PROVIDER)
+    private var db: FirebaseFirestore? = null
 
     /**
      * OnCompleteListener for the getLastKnownLocation function,
@@ -87,12 +91,51 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
 
 
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+        db = FirebaseFirestore.getInstance()
 
         getLastKnownLocation(oclNewTarget)
 
         btnNewTarget.setOnClickListener{ getLastKnownLocation(oclNewTarget)}
 
         btnClaimPoints.setOnClickListener{ getLastKnownLocation(oclClaimPoints) }
+
+        btnSavePts.setOnClickListener{
+
+            val user = HashMap<String, Any>()
+            user["name"] = FirebaseAuth.getInstance().currentUser?.email.toString()
+            user["points"] = Integer.parseInt(tvUserPoints.text
+                    .toString().replace("[\\D]".toRegex(), ""))
+            //Todo: find out what does the parsing do
+
+            db?.collection("users")
+                    ?.add(user)
+                    ?.addOnSuccessListener { documentReference ->
+                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.id)
+                    }
+                    ?.addOnFailureListener { e ->
+                        Log.w(TAG, "Error adding document", e)
+                    }
+
+        }
+
+        btnLoadPts.setOnClickListener {
+
+            db?.collection("users")
+                    ?.get()
+                    ?.addOnSuccessListener { result ->
+                        for (document in result) {
+                            Log.d(TAG, document.id + " => " + document.data)
+                            Toast.makeText(this,document.id+"\n"+document.data,Toast.LENGTH_LONG).show()
+                            if(document.get("name") == FirebaseAuth.getInstance().currentUser?.email.toString()){
+                                tvUserPoints.text = document.get("points").toString() + " points"
+                            }
+                        }
+                    }
+                    ?.addOnFailureListener { exception ->
+                        Log.w(TAG, "Error getting documents.", exception)
+                    } }
+
+
 
 
         val filter = IntentFilter("com.jose.fitnessgo.ProximityAlert")
@@ -204,6 +247,7 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
 
         //Todo: fails at midnight
         val timeTaken = System.currentTimeMillis() - startTimeOfRound
+        //Todo: find out what does the parsing do
         val userPoints = Integer.parseInt(tvUserPoints.text
                 .toString().replace("[\\D]".toRegex(), "")).toFloat().toDouble()
         var earnedPoints = (distanceInMeters!! * 5 - timeTaken / 1000).toDouble()

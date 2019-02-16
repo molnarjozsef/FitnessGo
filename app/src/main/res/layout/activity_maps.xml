@@ -40,12 +40,35 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="10"
                 android:text="@string/generate_new_target_btn" />
+
             <Button
                 android:id="@+id/btnClaimPoints"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="10"
                 android:text="@string/claim_points_btn" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="10"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnSavePts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="10"
+                android:text="Save points" />
+
+            <Button
+                android:id="@+id/btnLoadPts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="10"
+                android:text="Load points" />
 
         </LinearLayout>
 
