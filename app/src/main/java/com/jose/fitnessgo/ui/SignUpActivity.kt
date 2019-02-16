@@ -1,11 +1,11 @@
 package com.jose.fitnessgo.ui
 
-import android.support.v7.app.AppCompatActivity
+import android.content.Intent
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.util.Patterns
 import android.view.View
 import android.widget.Toast
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.jose.fitnessgo.R
@@ -62,6 +62,10 @@ class SignUpActivity : AppCompatActivity() {
                 ?.addOnSuccessListener {
                     Toast.makeText(this, "Registration successful", Toast.LENGTH_LONG).show()
                     pbSignUp.visibility = View.GONE
+
+                    val loginIntent = Intent(this, MainActivity::class.java)
+                    loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                    startActivity(loginIntent)
         }
                 ?.addOnFailureListener {
                     Toast.makeText(this, "Registration unsuccessful: " +
