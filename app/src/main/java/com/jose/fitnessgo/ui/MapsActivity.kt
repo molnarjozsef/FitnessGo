@@ -128,7 +128,9 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
                             Log.d(TAG, document.id + " => " + document.data)
                             Toast.makeText(this,document.id+"\n"+document.data,Toast.LENGTH_LONG).show()
                             if(document.get("name") == FirebaseAuth.getInstance().currentUser?.email.toString()){
-                                tvUserPoints.text = document.get("points").toString() + " points"
+                                userPoints = Integer.parseInt(document.get("points").toString())
+                                refreshUserPointsView(userPoints)
+
                             }
                         }
                     }
