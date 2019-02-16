@@ -58,8 +58,8 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
             userLocation = task.result ?: userLocation
         }
         if (userLocation!!.distanceTo(targetLocation) < EXPECTED_RANGE_TO_TARGET) {
-            val newPoints = calculateNewPoints()
-            tvUserPoints.text = getString(R.string._points, newPoints)
+            userPoints = calculateNewPoints(userPoints, System.currentTimeMillis(), startTimeOfRound)
+            refreshUserPointsView(userPoints)
         } else {
             Toast.makeText(this@MapsActivity,
                     getString(R.string.not_close_enough) + "\n" +
@@ -252,13 +252,15 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
      * This function should be called when the user gets to the target location
      * It calculates the earned points, and gives it back
      */
-    internal fun calculateNewPoints(): Int {
+    internal fun calculateNewPoints(userPts: Int, currentTime: Long, prevTime: Long): Int {
 
         //Todo: fails at midnight
-        val timeTaken = System.currentTimeMillis() - startTimeOfRound
+        val timeTaken = currentTime - prevTime
         //Todo: find out what does the parsing do
+        /*
         val userPoints = Integer.parseInt(tvUserPoints.text
                 .toString().replace("[\\D]".toRegex(), "")).toFloat().toDouble()
+        */
         var earnedPoints = (distanceInMeters!! * 5 - timeTaken / 1000).toDouble()
         if (earnedPoints < 10) {
             earnedPoints = 0.0
@@ -266,7 +268,7 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
 
         //Disabling the Claim Points button, because the points were already given to the user
         btnClaimPoints?.isEnabled = false
-        return (userPoints + earnedPoints).toInt()
+        return (userPts + earnedPoints).toInt()
     }
 
     /**
@@ -277,8 +279,8 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
 
 
             tvTargetAddress.append("\n\n Destination reached!")
-            val newPoints = calculateNewPoints()
-            refreshUserPointsView(newPoints)
+            userPoints = calculateNewPoints(userPoints, System.currentTimeMillis(), startTimeOfRound)
+            refreshUserPointsView(userPoints)
             //tvUserPoints.text = newPoints.toString() + " points"
         }
     }
