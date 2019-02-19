@@ -21,6 +21,7 @@ import android.widget.Toast
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.jose.fitnessgo.Constants.ERROR_DIALOG_REQUEST
 import com.jose.fitnessgo.Constants.PERMISSIONS_REQUEST_FINE_LOCATION
 import com.jose.fitnessgo.R
@@ -32,6 +33,8 @@ class MainActivity : AppCompatActivity() {
 
     // Variables
     private val mLocationPermissionGranted = false
+    private var db: FirebaseFirestore? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,10 +54,27 @@ class MainActivity : AppCompatActivity() {
         }
 
         val mAuth = FirebaseAuth.getInstance()
+        db = FirebaseFirestore.getInstance()
+
         val navigationView: NavigationView = findViewById(R.id.nav_view);
         val headerview: View = navigationView.getHeaderView(0);
         val profileEmail: TextView = headerview.findViewById(R.id.tvUserEmail);
         profileEmail.text = mAuth.currentUser?.email.toString()
+
+        db?.collection("users")
+                ?.get()
+                ?.addOnSuccessListener { result ->
+                    for (document in result) {
+                        Log.d("TAG_MAIN_ACTIVITY", document.id + " => " + document.data)
+                        if(document.get("email") == FirebaseAuth.getInstance().currentUser?.email.toString()){
+                            profileEmail.text = (document.get("name") ?: mAuth.currentUser?.email).toString()
+
+                        }
+                    }
+                }
+                ?.addOnFailureListener { exception ->
+                    Log.w("TAG_MAIN_ACTIVITY", "Error getting documents.", exception)
+                }
 
 
     }
