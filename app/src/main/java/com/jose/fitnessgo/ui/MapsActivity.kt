@@ -94,6 +94,9 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         db = FirebaseFirestore.getInstance()
 
+
+        loadPtsFromDb()
+
         getLastKnownLocation(oclNewTarget)
 
         btnNewTarget.setOnClickListener{ getLastKnownLocation(oclNewTarget)}
@@ -108,10 +111,12 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
                     .toString().replace("[\\D]".toRegex(), ""))
             //Todo: find out what does the parsing do
 
-            db?.collection("users")
-                    ?.add(user)
+            db?.collection("users")?.document(FirebaseAuth.getInstance().currentUser?.email.toString())
+
+                    //?.add(user)
+                    ?.set(user)
                     ?.addOnSuccessListener { documentReference ->
-                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.id)
+                        Log.d(TAG, "Added")
                     }
                     ?.addOnFailureListener { e ->
                         Log.w(TAG, "Error adding document", e)
@@ -120,23 +125,8 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
         }
 
         btnLoadPts.setOnClickListener {
-
-            db?.collection("users")
-                    ?.get()
-                    ?.addOnSuccessListener { result ->
-                        for (document in result) {
-                            Log.d(TAG, document.id + " => " + document.data)
-                            Toast.makeText(this,document.id+"\n"+document.data,Toast.LENGTH_LONG).show()
-                            if(document.get("name") == FirebaseAuth.getInstance().currentUser?.email.toString()){
-                                userPoints = Integer.parseInt(document.get("points").toString())
-                                refreshUserPointsView(userPoints)
-
-                            }
-                        }
-                    }
-                    ?.addOnFailureListener { exception ->
-                        Log.w(TAG, "Error getting documents.", exception)
-                    } }
+            loadPtsFromDb()
+        }
 
 
 
@@ -152,6 +142,24 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
      */
     fun refreshUserPointsView(pts: Int){
         tvUserPoints.text = pts.toString() + " points"
+    }
+
+    fun loadPtsFromDb(){
+        db?.collection("users")
+                ?.get()
+                ?.addOnSuccessListener { result ->
+                    for (document in result) {
+                        Log.d(TAG, document.id + " => " + document.data)
+                        if(document.get("name") == FirebaseAuth.getInstance().currentUser?.email.toString()){
+                            userPoints = Integer.parseInt(document.get("points").toString())
+                            refreshUserPointsView(userPoints)
+
+                        }
+                    }
+                }
+                ?.addOnFailureListener { exception ->
+                    Log.w(TAG, "Error getting documents.", exception)
+                }
     }
 
 
