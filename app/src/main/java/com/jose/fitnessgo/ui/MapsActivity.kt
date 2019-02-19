@@ -106,7 +106,7 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
         btnSavePts.setOnClickListener{
 
             val user = HashMap<String, Any>()
-            user["name"] = FirebaseAuth.getInstance().currentUser?.email.toString()
+            user["email"] = FirebaseAuth.getInstance().currentUser?.email.toString()
             user["points"] = Integer.parseInt(tvUserPoints.text
                     .toString().replace("[\\D]".toRegex(), ""))
             //Todo: find out what does the parsing do
@@ -114,7 +114,7 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
             db?.collection("users")?.document(FirebaseAuth.getInstance().currentUser?.email.toString())
 
                     //?.add(user)
-                    ?.set(user)
+                    ?.update(user)
                     ?.addOnSuccessListener { documentReference ->
                         Log.d(TAG, "Added")
                     }
@@ -155,7 +155,7 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
                 ?.addOnSuccessListener { result ->
                     for (document in result) {
                         Log.d(TAG, document.id + " => " + document.data)
-                        if(document.get("name") == FirebaseAuth.getInstance().currentUser?.email.toString()){
+                        if(document.get("email") == FirebaseAuth.getInstance().currentUser?.email.toString()){
                             userPoints = Integer.parseInt(document.get("points").toString())
                             refreshUserPointsView(userPoints)
 

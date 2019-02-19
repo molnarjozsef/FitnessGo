@@ -31,6 +31,13 @@ class HomeFragment : Fragment() {
                     ?.replace(com.jose.fitnessgo.R.id.fragment_container, LeaderBoardFragment())
                     ?.commit()
         }
+        cvProfileSettings.setOnClickListener {
+            activity?.supportFragmentManager
+                    ?.beginTransaction()
+                    ?.addToBackStack(null)
+                    ?.replace(com.jose.fitnessgo.R.id.fragment_container, ProfileSettingsFragment())
+                    ?.commit()
+        }
 
         val mAuth = FirebaseAuth.getInstance()
         tvUserSettings.text = mAuth.currentUser?.email.toString()

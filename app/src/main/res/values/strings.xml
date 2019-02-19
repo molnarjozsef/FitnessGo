@@ -7,18 +7,18 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="title_activity_main">Fitness Go</string>
 
-    <string name="hello_blank_fragment"></string>
+    <string name="hello_blank_fragment" />
 
 
     <string name="not_close_enough">Not close enough.</string>
     <string name="_meters_still_to_go">meters still to go!</string>
     <string name="meters_from_start_pos">meters away from the start</string>
-    <string name="loading_first_location">Loading first location...</string>
+    <string name="loading_first_location">Loading first location…</string>
     <string name="in_this_round_you_have_to_run">In this round you have to run</string>
     <string name="meters">meters</string>
     <string name="this_round_is">This round is</string>
     <string name="_points">%1$d points</string>
-    <string name="_0_points">Loading points...</string>
+    <string name="_0_points">Loading points…</string>
     <string name="generate_new_target_btn">New target</string>
     <string name="claim_points_btn">Claim points</string>
 
@@ -27,4 +27,8 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="leaderboard">Leaderboard</string>
     <string name="leaderboard_detailed">See who has the most points</string>
+    <string name="profile_settings">Profile settings</string>
+    <string name="profile_settings_detail">Choose a unique username</string>
+    <string name="run_the_city">Run the city</string>
+    <string name="run_the_city_detail">Reach checkpoints and get score</string>
 </resources>

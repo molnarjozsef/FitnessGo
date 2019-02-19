@@ -49,7 +49,7 @@ class LeaderBoardFragment : Fragment() {
                     for (document in result) {
                         Log.d("TAG_LEADERBOARD", document.id + " => " + document.data)
                         leaderBoardEntries.put(
-                                document.get("name").toString(),
+                                document.get("email").toString(),
                                 Integer.parseInt(document.get("points").toString())
                         )
                     }
