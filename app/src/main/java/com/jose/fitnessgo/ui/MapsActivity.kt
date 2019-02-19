@@ -144,6 +144,11 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
         tvUserPoints.text = pts.toString() + " points"
     }
 
+
+    /**
+     * Loads the user points from the Firestore cloud database
+     * updates the points in the userPoints variable of this activity
+     */
     fun loadPtsFromDb(){
         db?.collection("users")
                 ?.get()
