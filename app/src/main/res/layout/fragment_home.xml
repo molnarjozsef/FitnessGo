@@ -92,13 +92,13 @@
                         android:layout_height="64dp"
                         android:background="@drawable/cerclebackgroundpink"
                         android:padding="10dp"
-                        android:src="@drawable/ic_lightbulb_outline_black_24dp" />
+                        android:src="@drawable/ic_people_black_24dp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:text="Sample button"
+                        android:text="@string/leaderboard"
                         android:textStyle="bold" />
 
                     <View
@@ -112,7 +112,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:padding="5dp"
-                        android:text="Sample text"
+                        android:text="@string/leaderboard_detailed"
                         android:textColor="@android:color/darker_gray" />
 
                 </LinearLayout>
