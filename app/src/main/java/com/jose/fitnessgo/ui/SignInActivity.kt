@@ -63,7 +63,6 @@ class SignInActivity : AppCompatActivity() {
         mAuth?.signInWithEmailAndPassword(email,password)
                 ?.addOnSuccessListener {
                     //Toast.makeText(this, "Login successful", Toast.LENGTH_LONG).show()
-                    pbSignIn.visibility = View.GONE
 
                     val loginIntent = Intent(this, MainActivity::class.java)
                     loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
@@ -73,6 +72,8 @@ class SignInActivity : AppCompatActivity() {
                 ?.addOnFailureListener {
                     Toast.makeText(this, "Login unsuccessful: " +
                             "${it.message}", Toast.LENGTH_LONG).show()
+                }
+                ?.addOnCompleteListener {
                     pbSignIn.visibility = View.GONE
                 }
 

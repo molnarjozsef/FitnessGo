@@ -61,17 +61,18 @@ class SignUpActivity : AppCompatActivity() {
         mAuth?.createUserWithEmailAndPassword(email,password)
                 ?.addOnSuccessListener {
                     Toast.makeText(this, "Registration successful", Toast.LENGTH_LONG).show()
-                    pbSignUp.visibility = View.GONE
 
                     val loginIntent = Intent(this, MainActivity::class.java)
                     loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                     startActivity(loginIntent)
-        }
+                }
                 ?.addOnFailureListener {
                     Toast.makeText(this, "Registration unsuccessful: " +
                             "${it.message}", Toast.LENGTH_LONG).show()
+                }
+                ?.addOnCompleteListener {
                     pbSignUp.visibility = View.GONE
-        }
+                }
 
 
     }
