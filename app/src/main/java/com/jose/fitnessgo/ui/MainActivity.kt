@@ -56,9 +56,9 @@ class MainActivity : AppCompatActivity() {
         val mAuth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
-        val navigationView: NavigationView = findViewById(R.id.nav_view);
-        val headerview: View = navigationView.getHeaderView(0);
-        val profileEmail: TextView = headerview.findViewById(R.id.tvUserEmail);
+        val navigationView: NavigationView = findViewById(R.id.nav_view)
+        val headerview: View = navigationView.getHeaderView(0)
+        val profileEmail: TextView = headerview.findViewById(R.id.tvUserEmail)
         profileEmail.text = mAuth.currentUser?.email.toString()
 
         db?.collection("users")
@@ -68,8 +68,14 @@ class MainActivity : AppCompatActivity() {
                         Log.d("TAG_MAIN_ACTIVITY", document.id + " => " + document.data)
                         if(document.get("email") == FirebaseAuth.getInstance().currentUser?.email.toString()){
                             profileEmail.text = (document.get("name") ?: mAuth.currentUser?.email).toString()
-
+                            return@addOnSuccessListener
                         }
+                        val user = HashMap<String, Any>()
+                        user["email"] = FirebaseAuth.getInstance().currentUser?.email.toString()
+                        db?.collection("users")
+                                ?.document(FirebaseAuth.getInstance().currentUser?.email.toString())
+                                ?.set(user)
+
                     }
                 }
                 ?.addOnFailureListener { exception ->

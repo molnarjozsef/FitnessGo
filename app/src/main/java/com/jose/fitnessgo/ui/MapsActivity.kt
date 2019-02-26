@@ -57,13 +57,14 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
         if (task.isSuccessful) {
             userLocation = task.result ?: userLocation
         }
-        if (userLocation!!.distanceTo(targetLocation) < EXPECTED_RANGE_TO_TARGET) {
+        if (userLocation.distanceTo(targetLocation) < EXPECTED_RANGE_TO_TARGET) {
             userPoints = calculateNewPoints(userPoints, System.currentTimeMillis(), startTimeOfRound)
             refreshUserPointsView(userPoints)
+            savePtsToDb()
         } else {
             Toast.makeText(this@MapsActivity,
                     getString(R.string.not_close_enough) + "\n" +
-                            userLocation!!.distanceTo(targetLocation).toInt() + " " +
+                            userLocation.distanceTo(targetLocation).toInt() + " " +
                             getString(R.string._meters_still_to_go),
                     Toast.LENGTH_LONG).show()
         }
@@ -103,28 +104,11 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
 
         btnClaimPoints.setOnClickListener{ getLastKnownLocation(oclClaimPoints) }
 
-        btnSavePts.setOnClickListener{
-
-            val user = HashMap<String, Any>()
-            user["email"] = FirebaseAuth.getInstance().currentUser?.email.toString()
-            user["points"] = Integer.parseInt(tvUserPoints.text
-                    .toString().replace("[\\D]".toRegex(), ""))
-            //Todo: find out what does the parsing do
-
-            db?.collection("users")?.document(FirebaseAuth.getInstance().currentUser?.email.toString())
-
-                    //?.add(user)
-                    ?.update(user)
-                    ?.addOnSuccessListener { documentReference ->
-                        Log.d(TAG, "Added")
-                    }
-                    ?.addOnFailureListener { e ->
-                        Log.w(TAG, "Error adding document", e)
-                    }
-
+        btnSavePts?.setOnClickListener{
+            savePtsToDb()
         }
 
-        btnLoadPts.setOnClickListener {
+        btnLoadPts?.setOnClickListener {
             loadPtsFromDb()
         }
 
@@ -151,22 +135,50 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
      */
     fun loadPtsFromDb(){
         db?.collection("users")
+                ?.document(FirebaseAuth.getInstance().currentUser?.email.toString())
                 ?.get()
-                ?.addOnSuccessListener { result ->
-                    for (document in result) {
-                        Log.d(TAG, document.id + " => " + document.data)
-                        if(document.get("email") == FirebaseAuth.getInstance().currentUser?.email.toString()){
-                            userPoints = Integer.parseInt(document.get("points").toString())
-                            refreshUserPointsView(userPoints)
-
-                        }
+                ?.addOnSuccessListener {document ->
+                    if (document?.get("points") != null) {
+                        userPoints = Integer.parseInt(document.get("points").toString())
+                        refreshUserPointsView(userPoints)
+                    } else {
+                        userPoints = 0
+                        refreshUserPointsView(userPoints)
+                        savePtsToDb()
                     }
+
                 }
                 ?.addOnFailureListener { exception ->
                     Log.w(TAG, "Error getting documents.", exception)
                 }
     }
 
+
+
+    fun savePtsToDb(){
+
+        val userPts = HashMap<String, Any>()
+        userPts["email"] = FirebaseAuth.getInstance().currentUser?.email.toString()
+        userPts["points"] = Integer.parseInt(tvUserPoints.text
+                .toString().replace("[\\D]".toRegex(), ""))
+        //Todo: find out what does the parsing do
+
+        db?.collection("users")?.document(FirebaseAuth.getInstance().currentUser?.email.toString())
+
+                //?.add(user)
+                ?.update(userPts)
+                ?.addOnSuccessListener { documentReference ->
+                    Log.d(TAG, "Added")
+                }
+                ?.addOnFailureListener { e ->
+                    Log.w(TAG, "Error adding document", e)
+                }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        savePtsToDb()
+    }
 
     /**
      * Manipulates the map once available.
@@ -191,7 +203,7 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
      * Requests the last known location of the device
      * @param ocl
      */
-    fun getLastKnownLocation(ocl: OnCompleteListener<Location>) {
+    private fun getLastKnownLocation(ocl: OnCompleteListener<Location>) {
         Log.d(TAG, "getLastKnownLocation: called.")
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat
@@ -201,9 +213,9 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
         mFusedLocationProviderClient!!.lastLocation.addOnCompleteListener(ocl)
     }
 
-    fun newTargetLocation() {
-        targetLatLng = LatLng(userLocation!!.latitude - 0.0025 + Math.random() * 0.005,
-                userLocation!!.longitude - 0.0025 * 1.48 + Math.random() * 0.005 * 1.48)
+    private fun newTargetLocation() {
+        targetLatLng = LatLng(userLocation.latitude - 0.0025 + Math.random() * 0.005,
+                userLocation.longitude - 0.0025 * 1.48 + Math.random() * 0.005 * 1.48)
 
 
         val geocoder = Geocoder(this@MapsActivity, Locale.getDefault())
@@ -221,9 +233,9 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
         // Measuring the starting distance to the target
         targetLocation.latitude = targetLatLng!!.latitude
         targetLocation.longitude = targetLatLng!!.longitude
-        distanceInMeters = userLocation!!.distanceTo(targetLocation).toInt()
+        distanceInMeters = userLocation.distanceTo(targetLocation).toInt()
         tvTargetAddress.append("\n" + getString(R.string.this_round_is) + " "
-                + distanceInMeters!!.toString() + " " + getString(R.string.meters))
+                + distanceInMeters.toString() + " " + getString(R.string.meters))
 
         startTimeOfRound = System.currentTimeMillis()
 
@@ -253,8 +265,8 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
                 .title("This is where you should get, as fast as you can"))
         mMap!!.animateCamera(CameraUpdateFactory
                 .newLatLngZoom(LatLng(
-                        (targetLocation.latitude + userLocation!!.latitude) / 2,
-                        (targetLocation.longitude + userLocation!!.longitude) / 2),
+                        (targetLocation.latitude + userLocation.latitude) / 2,
+                        (targetLocation.longitude + userLocation.longitude) / 2),
                         16.0f))
 
 
@@ -269,14 +281,13 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
      */
     internal fun calculateNewPoints(userPts: Int, currentTime: Long, prevTime: Long): Int {
 
-        //Todo: fails at midnight
         val timeTaken = currentTime - prevTime
         //Todo: find out what does the parsing do
         /*
         val userPoints = Integer.parseInt(tvUserPoints.text
                 .toString().replace("[\\D]".toRegex(), "")).toFloat().toDouble()
         */
-        var earnedPoints = (distanceInMeters!! * 5 - timeTaken / 1000).toDouble()
+        var earnedPoints = (distanceInMeters * 5 - timeTaken / 1000).toDouble()
         if (earnedPoints < 10) {
             earnedPoints = 0.0
         }
@@ -296,13 +307,13 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
             tvTargetAddress.append("\n\n Destination reached!")
             userPoints = calculateNewPoints(userPoints, System.currentTimeMillis(), startTimeOfRound)
             refreshUserPointsView(userPoints)
-            //tvUserPoints.text = newPoints.toString() + " points"
+            savePtsToDb()
         }
     }
 
     companion object {
 
         private val TAG = "MapsActivity"
-        val EXPECTED_RANGE_TO_TARGET = 100
+        const val EXPECTED_RANGE_TO_TARGET = 100
     }
 }
