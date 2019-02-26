@@ -38,7 +38,7 @@ class LeaderBoardFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         pbLeaderBoard.visibility = View.VISIBLE
-        var leaderBoardEntries = hashMapOf<String, Int>()
+        val leaderBoardEntries = hashMapOf<String, Int>()
 
         //leaderBoardEntries.put("asd","meow")
         //leaderBoardEntries.put("bsd","vau")
@@ -50,7 +50,7 @@ class LeaderBoardFragment : Fragment() {
                         Log.d("TAG_LEADERBOARD", document.id + " => " + document.data)
                         leaderBoardEntries.put(
                                 (document.get("name") ?: document.get("email")).toString(),
-                                Integer.parseInt(document.get("points").toString())
+                                Integer.parseInt(document.get("points")?.toString() ?: "0")
                         )
                     }
                     val leaderBoardResult = leaderBoardEntries.toList().sortedByDescending { (_, value) -> value}.toMap()

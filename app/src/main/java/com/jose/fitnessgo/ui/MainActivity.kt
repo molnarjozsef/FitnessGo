@@ -31,9 +31,9 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity() {
 
 
-    // Variables
-    private val mLocationPermissionGranted = false
-    private var db: FirebaseFirestore? = null
+    // Firebase, Firestore
+    private lateinit var db: FirebaseFirestore
+    private lateinit var auth: FirebaseAuth
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,36 +53,47 @@ class MainActivity : AppCompatActivity() {
             //navigationView.setCheckedItem(com.jose.fitnessgo.R.id.nav_message)
         }
 
-        val mAuth = FirebaseAuth.getInstance()
+
+        // Firebase, firestore instances
+        auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
+
+
+        // Showing email in the drawer header
         val navigationView: NavigationView = findViewById(R.id.nav_view)
         val headerview: View = navigationView.getHeaderView(0)
         val profileEmail: TextView = headerview.findViewById(R.id.tvUserEmail)
-        profileEmail.text = mAuth.currentUser?.email.toString()
+        profileEmail.text = auth.currentUser?.email.toString()
 
-        db?.collection("users")
-                ?.get()
-                ?.addOnSuccessListener { result ->
+
+        // Showing username in the drawer header if available
+        // If user profile is not found in the DB, user is added to the DB
+        db.collection("users")
+                .get()
+                .addOnSuccessListener { result ->
                     for (document in result) {
                         Log.d("TAG_MAIN_ACTIVITY", document.id + " => " + document.data)
                         if(document.get("email") == FirebaseAuth.getInstance().currentUser?.email.toString()){
-                            profileEmail.text = (document.get("name") ?: mAuth.currentUser?.email).toString()
+                            profileEmail.text = (document.get("name") ?: auth.currentUser?.email).toString()
                             return@addOnSuccessListener
                         }
                         val user = HashMap<String, Any>()
                         user["email"] = FirebaseAuth.getInstance().currentUser?.email.toString()
-                        db?.collection("users")
-                                ?.document(FirebaseAuth.getInstance().currentUser?.email.toString())
-                                ?.set(user)
+                        db.collection("users").document(FirebaseAuth.getInstance().currentUser?.email.toString()).set(user)
 
                     }
-                }
-                ?.addOnFailureListener { exception ->
+                }.addOnFailureListener { exception ->
                     Log.w("TAG_MAIN_ACTIVITY", "Error getting documents.", exception)
                 }
+    }
 
+    override fun onResume() {
+        isServicesOK
+        isMapsEnabled
+        checkRequestLocationPermission()
 
+        super.onResume()
     }
 
     override fun onBackPressed(){
@@ -96,11 +107,11 @@ class MainActivity : AppCompatActivity() {
 
     /**
      * Checks for Google Play services on the current device
-     * @return
+     * @return true if services are OK
      */
     // Everything is fine and the user can make map requests
-    // An error occured but we can resolve it
-    val isServicesOK: Boolean
+    // An error occurred but we can resolve it
+    private val isServicesOK: Boolean
         get() {
             Log.d(TAG, "isServicesOK: checking google services version")
 
@@ -122,9 +133,9 @@ class MainActivity : AppCompatActivity() {
 
     /**
      * Checks if GPS location is enabled on the current device
-     * @return
+     * @return true if enabled
      */
-    val isMapsEnabled: Boolean
+    private val isMapsEnabled: Boolean
         get() {
             val manager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
@@ -134,21 +145,6 @@ class MainActivity : AppCompatActivity() {
             }
             return true
         }
-
-
-
-    override fun onResume() {
-
-        isServicesOK
-        isMapsEnabled
-        checkRequestLocationPermission()
-
-
-
-
-        super.onResume()
-    }
-
 
 
     /**
@@ -171,7 +167,7 @@ class MainActivity : AppCompatActivity() {
         val builder = AlertDialog.Builder(this)
         builder.setMessage("This application requires GPS to work at all, do you want to enable it?")
                 .setCancelable(false)
-                .setPositiveButton("Yes") { dialog, id ->
+                .setPositiveButton("Yes") { _, _ ->
                     val enableGpsIntent = Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS)
                     startActivity(enableGpsIntent)
                 }
