@@ -53,6 +53,7 @@ class MainActivity : AppCompatActivity() {
             //navigationView.setCheckedItem(com.jose.fitnessgo.R.id.nav_message)
         }
 
+
         // Firebase, firestore instances
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
@@ -61,6 +62,7 @@ class MainActivity : AppCompatActivity() {
         val navigationView: NavigationView = findViewById(R.id.nav_view)
         val headerview: View = navigationView.getHeaderView(0)
         val profileEmail: TextView = headerview.findViewById(R.id.tvUserEmail)
+        val profileUserName: TextView = headerview.findViewById(R.id.tvUserName)
         profileEmail.text = auth.currentUser?.email.toString()
 
 
@@ -72,14 +74,13 @@ class MainActivity : AppCompatActivity() {
                     for (document in result) {
                         Log.d("TAG_MAIN_ACTIVITY", document.id + " => " + document.data)
                         if(document.get("email") == FirebaseAuth.getInstance().currentUser?.email.toString()){
-                            profileEmail.text = (document.get("name") ?: auth.currentUser?.email).toString()
+                            profileUserName.text = (document.get("name") ?: " ").toString()
                             return@addOnSuccessListener
                         }
-                        val user = HashMap<String, Any>()
-                        user["email"] = FirebaseAuth.getInstance().currentUser?.email.toString()
-                        db.collection("users").document(FirebaseAuth.getInstance().currentUser?.email.toString()).set(user)
-
                     }
+                    val user = HashMap<String, Any>()
+                    user["email"] = FirebaseAuth.getInstance().currentUser?.email.toString()
+                    db.collection("users").document(FirebaseAuth.getInstance().currentUser?.email.toString()).set(user)
                 }.addOnFailureListener { exception ->
                     Log.w("TAG_MAIN_ACTIVITY", "Error getting documents.", exception)
                 }

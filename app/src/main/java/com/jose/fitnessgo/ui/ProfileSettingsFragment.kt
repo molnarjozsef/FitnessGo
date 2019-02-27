@@ -2,11 +2,13 @@ package com.jose.fitnessgo.ui
 
 import android.net.Uri
 import android.os.Bundle
+import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.jose.fitnessgo.R
@@ -37,7 +39,6 @@ class ProfileSettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val mAuth = FirebaseAuth.getInstance()
-        tvUserEmail.text = mAuth.currentUser?.email.toString()
 
         btnSetUserName.setOnClickListener {
             val user = HashMap<String, Any>()
@@ -51,6 +52,10 @@ class ProfileSettingsFragment : Fragment() {
                     ?.update(user)
                     ?.addOnSuccessListener { documentReference ->
                         Log.d("TAG_PROFILE_SETTINGS", "Added")
+                        val navigationView: NavigationView? = activity?.findViewById(R.id.nav_view)
+                        val headerview: View? = navigationView?.getHeaderView(0)
+                        val tvUserName: TextView? = headerview?.findViewById(R.id.tvUserName)
+                        tvUserName?.text = etUsername.text.toString()
                     }
                     ?.addOnFailureListener { e ->
                         Log.w("TAG_PROFILE_SETTINGS", "Error adding document", e)
