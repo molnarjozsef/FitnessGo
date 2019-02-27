@@ -181,7 +181,7 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
                         .checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return
         }
-        mFusedLocationProviderClient!!.lastLocation.addOnCompleteListener(ocl)
+        mFusedLocationProviderClient.lastLocation.addOnCompleteListener(ocl)
     }
 
     private fun newTargetLocation() {
