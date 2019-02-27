@@ -1,6 +1,5 @@
 package com.jose.fitnessgo.ui
 
-import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -21,8 +20,13 @@ class HomeFragment : Fragment() {
 
     override fun onStart() {
         cvGameStart.setOnClickListener {
-            val intent = Intent(activity, MapsActivity::class.java)
-            startActivity(intent)
+            //val intent = Intent(activity, MapsActivity::class.java)
+            //startActivity(intent)
+            activity?.supportFragmentManager
+                    ?.beginTransaction()
+                    ?.addToBackStack(null)
+                    ?.replace(com.jose.fitnessgo.R.id.fragment_container, MapsFragment())
+                    ?.commit()
         }
         cvLeaderBoard.setOnClickListener {
             activity?.supportFragmentManager

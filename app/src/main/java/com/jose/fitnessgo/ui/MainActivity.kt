@@ -53,12 +53,9 @@ class MainActivity : AppCompatActivity() {
             //navigationView.setCheckedItem(com.jose.fitnessgo.R.id.nav_message)
         }
 
-
         // Firebase, firestore instances
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
-
-
 
         // Showing email in the drawer header
         val navigationView: NavigationView = findViewById(R.id.nav_view)
