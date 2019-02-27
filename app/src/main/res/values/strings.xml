@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">FitnessGo</string>
+    <string name="app_name">Fitness Go</string>
     <string name="title_activity_maps">Map</string>
 
     <string name="title_activity_fullscreen">FullscreenActivity</string>
@@ -37,4 +37,6 @@
     <string name="pw_must_be_at_least_8_chars">Password must be at least 8 characters long</string>
     <string name="pw_is_required">Password is required</string>
     <string name="set_a_unique_username">Set a unique username</string>
+    <string name="log_out">Log out</string>
+    <string name="set_username">Set username</string>
 </resources>

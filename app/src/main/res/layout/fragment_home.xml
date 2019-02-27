@@ -244,7 +244,7 @@
                         android:layout_height="64dp"
                         android:background="@drawable/cerclebackgroundpurple"
                         android:padding="10dp"
-                        android:src="@drawable/ic_wifi_black_24dp" />
+                        android:src="@drawable/ic_settings_black_24dp" />
 
                     <TextView
                         android:id="@+id/tvUserSettings"

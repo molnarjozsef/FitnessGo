@@ -31,18 +31,13 @@ class LeaderBoardFragment : Fragment() {
         pbLeaderBoard.visibility = View.VISIBLE
         val leaderBoardEntries = hashMapOf<String, Int>()
 
-        //leaderBoardEntries.put("asd","meow")
-        //leaderBoardEntries.put("bsd","vau")
 
         db?.collection("users")
                 ?.get()
                 ?.addOnSuccessListener { result ->
                     for (document in result) {
-                        Log.d("TAG_LEADERBOARD", document.id + " => " + document.data)
-                        leaderBoardEntries.put(
-                                (document.get("name") ?: document.get("email")).toString(),
+                        leaderBoardEntries[(document.get("name") ?: document.get("email")).toString().substringBefore('@')] =
                                 Integer.parseInt(document.get("points")?.toString() ?: "0")
-                        )
                     }
                     val leaderBoardResult = leaderBoardEntries.toList().sortedByDescending { (_, value) -> value}.toMap()
 

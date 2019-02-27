@@ -29,8 +29,8 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     private fun registerUser(){
-        val email = etEmailSignUp.text.toString().trim()
-        val password = etPasswordSignUp.text.toString().trim()
+        val email = etEmailSignUp.editText?.text.toString().trim()
+        val password = etPasswordSignUp.editText?.text.toString().trim()
 
         if(email.isEmpty()){
             etEmailSignUp.error = getString(R.string.email_is_required)

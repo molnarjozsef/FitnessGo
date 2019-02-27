@@ -32,8 +32,8 @@ class SignInActivity : AppCompatActivity() {
     }
 
     fun userLogin(){
-        val email = etEmailSignIn.text.toString().trim()
-        val password = etPasswordSignIn.text.toString().trim()
+        val email = etEmailSignIn.editText?.text.toString().trim()
+        val password = etPasswordSignIn.editText?.text.toString().trim()
 
         if(email.isEmpty()){
             etEmailSignIn.error = getString(R.string.email_is_required)

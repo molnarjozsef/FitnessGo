@@ -25,9 +25,9 @@
                 android:icon="@drawable/ic_attach_money_black_24dp"
                 android:title="Share" />
             <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_lightbulb_outline_black_24dp"
-                android:title="Send" />
+                android:id="@+id/nav_logout"
+                android:icon="@drawable/ic_logout_black_24dp"
+                android:title="@string/log_out" />
         </menu>
     </item>
 

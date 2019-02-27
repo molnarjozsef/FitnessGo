@@ -66,6 +66,17 @@ class MainActivity : AppCompatActivity() {
         profileEmail.text = auth.currentUser?.email.toString()
 
 
+
+        navigationView.setNavigationItemSelectedListener {
+            if(it.itemId == R.id.nav_logout){
+                auth.signOut()
+                startActivity(Intent(this,SignInActivity::class.java))
+                finish()
+            }
+            return@setNavigationItemSelectedListener true
+        }
+
+
         // Showing username in the drawer header if available
         // If user profile is not found in the DB, user is added to the DB
         db.collection("users")

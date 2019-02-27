@@ -5,7 +5,6 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.google.firebase.auth.FirebaseAuth
 import com.jose.fitnessgo.R
 import kotlinx.android.synthetic.main.fragment_home.*
 
@@ -43,8 +42,6 @@ class HomeFragment : Fragment() {
                     ?.commit()
         }
 
-        val mAuth = FirebaseAuth.getInstance()
-        tvUserSettings.text = mAuth.currentUser?.email.toString()
         super.onStart()
     }
 
