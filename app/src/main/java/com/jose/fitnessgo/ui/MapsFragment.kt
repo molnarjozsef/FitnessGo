@@ -56,7 +56,6 @@ class MapsFragment : Fragment(){
         super.onCreate(savedInstanceState)
 
 
-        //registerReceiver(pxr, filter)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -83,9 +82,8 @@ class MapsFragment : Fragment(){
         val filter = IntentFilter("com.jose.fitnessgo.ProximityAlert")
         pxr = AlertOnProximityReceiver()
 
-
-
-
+        this.activity?.registerReceiver(pxr, filter)
+        
 
         btnNewTarget.setOnClickListener{
             getLastKnownLocation(oclNewTarget)
