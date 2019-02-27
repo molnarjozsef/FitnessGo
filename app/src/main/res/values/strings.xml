@@ -18,6 +18,7 @@
     <string name="meters">meters</string>
     <string name="this_round_is">This round is</string>
     <string name="_points">%1$d points</string>
+    <string name="leaderboard_entry">%1$s %2$s: %3$d \n</string>
     <string name="_0_points">Loading points…</string>
     <string name="generate_new_target_btn">New target</string>
     <string name="claim_points_btn">Claim points</string>
@@ -31,4 +32,8 @@
     <string name="profile_settings_detail">Choose a unique username</string>
     <string name="run_the_city">Run the city</string>
     <string name="run_the_city_detail">Reach checkpoints and get score</string>
+    <string name="email_is_required">Email is required</string>
+    <string name="enter_a_valid_email">Please enter a valid email</string>
+    <string name="pw_must_be_at_least_8_chars">Password must be at least 8 characters long</string>
+    <string name="pw_is_required">Password is required</string>
 </resources>

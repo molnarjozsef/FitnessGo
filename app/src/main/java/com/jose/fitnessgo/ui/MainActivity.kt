@@ -117,15 +117,17 @@ class MainActivity : AppCompatActivity() {
 
             val available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this@MainActivity)
 
-            if (available == ConnectionResult.SUCCESS) {
-                Log.d(TAG, "isServicesOK: Google Play Services is working")
-                return true
-            } else if (GoogleApiAvailability.getInstance().isUserResolvableError(available)) {
-                Log.d(TAG, "isServicesOK: an error occured but we can fix it")
-                val dialog = GoogleApiAvailability.getInstance().getErrorDialog(this@MainActivity, available, ERROR_DIALOG_REQUEST)
-                dialog.show()
-            } else {
-                Toast.makeText(this, "You can't make map requests", Toast.LENGTH_SHORT).show()
+            when {
+                available == ConnectionResult.SUCCESS -> {
+                    Log.d(TAG, "isServicesOK: Google Play Services is working")
+                    return true
+                }
+                GoogleApiAvailability.getInstance().isUserResolvableError(available) -> {
+                    Log.d(TAG, "isServicesOK: an error occured but we can fix it")
+                    val dialog = GoogleApiAvailability.getInstance().getErrorDialog(this@MainActivity, available, ERROR_DIALOG_REQUEST)
+                    dialog.show()
+                }
+                else -> Toast.makeText(this, "You can't make map requests", Toast.LENGTH_SHORT).show()
             }
             return false
         }
@@ -165,9 +167,9 @@ class MainActivity : AppCompatActivity() {
      */
     private fun buildAlertMessageNoGps() {
         val builder = AlertDialog.Builder(this)
-        builder.setMessage("This application requires GPS to work at all, do you want to enable it?")
+        builder.setMessage("This application requires active GPS to work properly.")
                 .setCancelable(false)
-                .setPositiveButton("Yes") { _, _ ->
+                .setPositiveButton("Open GPS settings") { _, _ ->
                     val enableGpsIntent = Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS)
                     startActivity(enableGpsIntent)
                 }
@@ -177,7 +179,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
 
-        private val TAG = "MainActivity"
+        private const val TAG = "MainActivity"
     }
 
 }

@@ -14,15 +14,6 @@ import kotlinx.android.synthetic.main.fragment_leaderboard.*
 
 
 
-/**
- * A simple [Fragment] subclass.
- * Activities that contain this fragment must implement the
- * [LeaderBoardFragment.OnFragmentInteractionListener] interface
- * to handle interaction events.
- * Use the [LeaderBoardFragment.newInstance] factory method to
- * create an instance of this fragment.
- *
- */
 class LeaderBoardFragment : Fragment() {
 
 
@@ -56,7 +47,11 @@ class LeaderBoardFragment : Fragment() {
                     val leaderBoardResult = leaderBoardEntries.toList().sortedByDescending { (_, value) -> value}.toMap()
 
                     for (entry in leaderBoardResult) {
-                        tvLeaderBoard.text = "${tvLeaderBoard.text} ${entry.key}: ${entry.value}\n"
+                        tvLeaderBoard.text = resources.getString(
+                                R.string.leaderboard_entry,
+                                tvLeaderBoard.text.toString(),
+                                entry.key,
+                                entry.value)
                     }
                 }
                 ?.addOnFailureListener { exception ->

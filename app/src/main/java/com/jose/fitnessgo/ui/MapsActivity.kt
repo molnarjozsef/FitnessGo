@@ -37,50 +37,17 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
     private var mMap: GoogleMap? = null
     private var targetLatLng: LatLng? = null
     private var userLocation: Location = Location(LocationManager.GPS_PROVIDER)
-    private var mFusedLocationProviderClient: FusedLocationProviderClient? = null
+    private lateinit var mFusedLocationProviderClient: FusedLocationProviderClient
     private var distanceInMeters: Int = 1000000
     private var startTimeOfRound = System.currentTimeMillis()
     private var pxr: AlertOnProximityReceiver? = null
     private var proxIntent: Intent? = null
     private var proxPendIntent: PendingIntent? = null
     private val targetLocation = Location(LocationManager.GPS_PROVIDER)
-    private var db: FirebaseFirestore? = null
     private var userPoints: Int = 0
 
-    /**
-     * OnCompleteListener for the getLastKnownLocation function,
-     * After the location request completion,
-     * checks if the location claim was real, calculates the new points
-     * and updates the textview containing the points.
-     */
-    private var oclClaimPoints: OnCompleteListener<Location> = OnCompleteListener { task ->
-        if (task.isSuccessful) {
-            userLocation = task.result ?: userLocation
-        }
-        if (userLocation.distanceTo(targetLocation) < EXPECTED_RANGE_TO_TARGET) {
-            userPoints = calculateNewPoints(userPoints, System.currentTimeMillis(), startTimeOfRound)
-            refreshUserPointsView(userPoints)
-            savePtsToDb()
-        } else {
-            Toast.makeText(this@MapsActivity,
-                    getString(R.string.not_close_enough) + "\n" +
-                            userLocation.distanceTo(targetLocation).toInt() + " " +
-                            getString(R.string._meters_still_to_go),
-                    Toast.LENGTH_LONG).show()
-        }
-    }
 
-    /**
-     * OnCompleteListener for the getLastKnownLocation function
-     * After the location request completion, generates a new position
-     * and updates the map and the textviews.
-     */
-    private var oclNewTarget: OnCompleteListener<Location> = OnCompleteListener { task ->
-        if (task.isSuccessful) {
-            userLocation = task.result ?: userLocation
-        }
-        newTargetLocation()
-    }
+    private lateinit var db: FirebaseFirestore
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,24 +62,25 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         db = FirebaseFirestore.getInstance()
 
-
         loadPtsFromDb()
 
         getLastKnownLocation(oclNewTarget)
 
-        btnNewTarget.setOnClickListener{ getLastKnownLocation(oclNewTarget)}
+        btnNewTarget.setOnClickListener{
+            getLastKnownLocation(oclNewTarget)
+        }
 
-        btnClaimPoints.setOnClickListener{ getLastKnownLocation(oclClaimPoints) }
+        btnClaimPoints.setOnClickListener{
+            getLastKnownLocation(oclClaimPoints)
+        }
 
         btnSavePts?.setOnClickListener{
             savePtsToDb()
         }
 
-        btnLoadPts?.setOnClickListener {
+        btnLoadPts?.setOnClickListener{
             loadPtsFromDb()
         }
-
-
 
 
         val filter = IntentFilter("com.jose.fitnessgo.ProximityAlert")
@@ -120,12 +88,21 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
         registerReceiver(pxr, filter)
     }
 
+    override fun onResume() {
+        loadPtsFromDb()
+        super.onResume()
+    }
+
+    override fun onPause() {
+        savePtsToDb()
+        super.onPause()
+    }
 
     /**
      * Updates the TextView that shows the user points from the Integer parameter
      */
     fun refreshUserPointsView(pts: Int){
-        tvUserPoints.text = pts.toString() + " points"
+        tvUserPoints.text = resources.getString(R.string._points,pts)
     }
 
 
@@ -133,11 +110,11 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
      * Loads the user points from the Firestore cloud database
      * updates the points in the userPoints variable of this activity
      */
-    fun loadPtsFromDb(){
-        db?.collection("users")
-                ?.document(FirebaseAuth.getInstance().currentUser?.email.toString())
-                ?.get()
-                ?.addOnSuccessListener {document ->
+    private fun loadPtsFromDb(){
+        db.collection("users")
+                .document(FirebaseAuth.getInstance().currentUser?.email.toString())
+                .get()
+                .addOnSuccessListener { document ->
                     if (document?.get("points") != null) {
                         userPoints = Integer.parseInt(document.get("points").toString())
                         refreshUserPointsView(userPoints)
@@ -148,31 +125,25 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
                     }
 
                 }
-                ?.addOnFailureListener { exception ->
+                .addOnFailureListener { exception ->
                     Log.w(TAG, "Error getting documents.", exception)
                 }
     }
 
 
-
+    /**
+     * Updates the "points" value in the user's Firestore document with the current points
+     */
     fun savePtsToDb(){
 
-        val userPts = HashMap<String, Any>()
-        userPts["email"] = FirebaseAuth.getInstance().currentUser?.email.toString()
-        userPts["points"] = Integer.parseInt(tvUserPoints.text
-                .toString().replace("[\\D]".toRegex(), ""))
-        //Todo: find out what does the parsing do
+        val userPtsData = HashMap<String, Any>()
+        userPtsData["email"] = FirebaseAuth.getInstance().currentUser?.email.toString()
+        userPtsData["points"] = userPoints
 
-        db?.collection("users")?.document(FirebaseAuth.getInstance().currentUser?.email.toString())
+        db.collection("users").document(FirebaseAuth.getInstance().currentUser?.email.toString())
 
                 //?.add(user)
-                ?.update(userPts)
-                ?.addOnSuccessListener { documentReference ->
-                    Log.d(TAG, "Added")
-                }
-                ?.addOnFailureListener { e ->
-                    Log.w(TAG, "Error adding document", e)
-                }
+                .update(userPtsData)
     }
 
     override fun onBackPressed() {
@@ -282,11 +253,8 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
     internal fun calculateNewPoints(userPts: Int, currentTime: Long, prevTime: Long): Int {
 
         val timeTaken = currentTime - prevTime
-        //Todo: find out what does the parsing do
-        /*
-        val userPoints = Integer.parseInt(tvUserPoints.text
-                .toString().replace("[\\D]".toRegex(), "")).toFloat().toDouble()
-        */
+
+
         var earnedPoints = (distanceInMeters * 5 - timeTaken / 1000).toDouble()
         if (earnedPoints < 10) {
             earnedPoints = 0.0
@@ -298,11 +266,47 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
     }
 
     /**
+     * OnCompleteListener for the getLastKnownLocation function,
+     * After the location request completion,
+     * checks if the location claim was real, calculates the new points
+     * and updates the textview containing the points.
+     */
+    private var oclClaimPoints: OnCompleteListener<Location> = OnCompleteListener { task ->
+        if (task.isSuccessful) {
+            userLocation = task.result ?: userLocation
+        }
+        if (userLocation.distanceTo(targetLocation) < EXPECTED_RANGE_TO_TARGET) {
+            userPoints = calculateNewPoints(userPoints, System.currentTimeMillis(), startTimeOfRound)
+            refreshUserPointsView(userPoints)
+            savePtsToDb()
+        } else {
+            Toast.makeText(this@MapsActivity,
+                    getString(R.string.not_close_enough) + "\n" +
+                            userLocation.distanceTo(targetLocation).toInt() + " " +
+                            getString(R.string._meters_still_to_go),
+                    Toast.LENGTH_LONG).show()
+        }
+    }
+
+    /**
+     * OnCompleteListener for the getLastKnownLocation function
+     * After the location request completion, generates a new position
+     * and updates the map and the textviews.
+     */
+    private var oclNewTarget: OnCompleteListener<Location> = OnCompleteListener { task ->
+        if (task.isSuccessful) {
+            userLocation = task.result ?: userLocation
+        }
+        newTargetLocation()
+    }
+
+
+
+    /**
      * A BroadcastReceiver for the Proximity alert PendingIntent
      */
     inner class AlertOnProximityReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-
 
             tvTargetAddress.append("\n\n Destination reached!")
             userPoints = calculateNewPoints(userPoints, System.currentTimeMillis(), startTimeOfRound)
@@ -313,7 +317,7 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
 
     companion object {
 
-        private val TAG = "MapsActivity"
+        private const val TAG = "MAPS_ACTIVITY"
         const val EXPECTED_RANGE_TO_TARGET = 100
     }
 }

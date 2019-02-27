@@ -7,6 +7,7 @@ import android.util.Patterns
 import android.view.View
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.jose.fitnessgo.R
 import kotlinx.android.synthetic.main.activity_sign_in.*
 
 
@@ -35,25 +36,25 @@ class SignInActivity : AppCompatActivity() {
         val password = etPasswordSignIn.text.toString().trim()
 
         if(email.isEmpty()){
-            etEmailSignIn.setError("Email is required")
+            etEmailSignIn.error = getString(R.string.email_is_required)
             etEmailSignIn.requestFocus()
             return
         }
 
         if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
-            etEmailSignIn.setError("Please enter a valid email")
+            etEmailSignIn.error = getString(R.string.enter_a_valid_email)
             etEmailSignIn.requestFocus()
             return
         }
 
         if(password.isEmpty()){
-            etPasswordSignIn.setError("Password is required")
+            etPasswordSignIn.error = getString(R.string.pw_is_required)
             etPasswordSignIn.requestFocus()
             return
         }
 
         if(password.length < 8){
-            etPasswordSignIn.setError("Password is required")
+            etPasswordSignIn.error = getString(R.string.pw_must_be_at_least_8_chars)
             etPasswordSignIn.requestFocus()
             return
         }

@@ -28,30 +28,30 @@ class SignUpActivity : AppCompatActivity() {
         registerUser()
     }
 
-    fun registerUser(){
+    private fun registerUser(){
         val email = etEmailSignUp.text.toString().trim()
         val password = etPasswordSignUp.text.toString().trim()
 
         if(email.isEmpty()){
-            etEmailSignUp.setError("Email is required")
+            etEmailSignUp.error = getString(R.string.email_is_required)
             etEmailSignUp.requestFocus()
             return
         }
 
         if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
-            etEmailSignUp.setError("Please enter a valid email")
+            etEmailSignUp.error = getString(R.string.enter_a_valid_email)
             etEmailSignUp.requestFocus()
             return
         }
 
         if(password.isEmpty()){
-            etPasswordSignUp.setError("Password is required")
+            etPasswordSignUp.error = getString(R.string.pw_is_required)
             etPasswordSignUp.requestFocus()
             return
         }
 
         if(password.length < 8){
-            etPasswordSignUp.setError("Password is required")
+            etPasswordSignUp.error = getString(R.string.pw_must_be_at_least_8_chars)
             etPasswordSignUp.requestFocus()
             return
         }
