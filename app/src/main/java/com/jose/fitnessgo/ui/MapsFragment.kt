@@ -47,6 +47,7 @@ class MapsFragment : Fragment(){
     private var proxPendIntent: PendingIntent? = null
     private val targetLocation = Location(LocationManager.GPS_PROVIDER)
     private var userPoints: Int = 0
+    private val filter = IntentFilter("com.jose.fitnessgo.ProximityAlert")
 
 
     private lateinit var db: FirebaseFirestore
@@ -55,7 +56,8 @@ class MapsFragment : Fragment(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
+        pxr = AlertOnProximityReceiver()
+        this.activity?.registerReceiver(pxr, filter)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -79,11 +81,8 @@ class MapsFragment : Fragment(){
         getLastKnownLocation(oclNewTarget)
 
 
-        val filter = IntentFilter("com.jose.fitnessgo.ProximityAlert")
-        pxr = AlertOnProximityReceiver()
 
-        this.activity?.registerReceiver(pxr, filter)
-        
+
 
         btnNewTarget.setOnClickListener{
             getLastKnownLocation(oclNewTarget)
@@ -157,8 +156,8 @@ class MapsFragment : Fragment(){
         userPtsData["email"] = FirebaseAuth.getInstance().currentUser?.email.toString()
         userPtsData["points"] = userPoints
 
-        db.collection("users").document(FirebaseAuth.getInstance().currentUser?.email.toString())
-
+        db.collection("users")
+                .document(FirebaseAuth.getInstance().currentUser?.email.toString())
                 //?.add(user)
                 .update(userPtsData)
     }
@@ -178,13 +177,13 @@ class MapsFragment : Fragment(){
     fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        /*
+
         if (ActivityCompat.checkSelfPermission(this.context!!, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat
                         .checkSelfPermission(this.context!!, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return
         }
         mMap!!.isMyLocationEnabled = true
-        */
+
     }
 
     /**
@@ -325,9 +324,9 @@ class MapsFragment : Fragment(){
     inner class AlertOnProximityReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
 
-            tvTargetAddress.append("\n\n Destination reached!")
+            tvTargetAddress?.append("\n\n Destination reached!")
             userPoints = calculateNewPoints(userPoints, System.currentTimeMillis(), startTimeOfRound)
-            refreshUserPointsView(userPoints)
+            tvUserPoints?.let {refreshUserPointsView(userPoints)}
             savePtsToDb()
         }
     }
