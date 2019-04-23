@@ -39,4 +39,12 @@
     <string name="set_a_unique_username">Set a unique username</string>
     <string name="log_out">Log out</string>
     <string name="set_username">Set username</string>
+    <string name="password">password</string>
+    <string name="sign_in">Sign in</string>
+    <string name="sign_up">Sign up</string>
+    <string name="email_address">email address</string>
+    <string name="sign_up_to_continue">Sign up to continue</string>
+    <string name="don_t_have_an_account_register_now">Don\'t have an account? Register now</string>
+    <string name="load_points">Load points</string>
+    <string name="save_points">Save points</string>
 </resources>

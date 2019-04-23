@@ -15,15 +15,17 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
         android:ems="10"
-        android:hint="email address"
+        android:hint="@string/email_address"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" >
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.3">
+
         <android.support.design.widget.TextInputEditText
-            android:inputType="textEmailAddress"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:inputType="textEmailAddress" />
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
@@ -32,18 +34,19 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:hint="password"
+        android:hint="@string/password"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etEmailSignIn"
         app:passwordToggleEnabled="true">
+
         <android.support.design.widget.TextInputEditText
-            android:inputType="textPassword"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:inputType="textPassword" />
     </android.support.design.widget.TextInputLayout>
 
-    <Button
+    <com.ornach.nobobutton.NoboButton
         android:id="@+id/btnSignIn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -51,7 +54,15 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:onClick="signInOnClick"
-        android:text="Sign in"
+        app:nb_backgroundColor= "#30C08F"
+        app:nb_text="@string/sign_in"
+        app:nb_radius="14dp"
+        app:nb_textColor="#FFFFFF"
+        app:nb_textStyle="bold"
+        app:nb_drawableResource="@drawable/ic_login_white_24dp"
+        app:nb_iconPadding="8dp"
+        app:nb_textSize="14sp"
+        android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etPasswordSignIn" />
@@ -73,7 +84,6 @@
         app:layout_constraintVertical_bias="0.94" />
 
     <ProgressBar
-        android:visibility="gone"
         android:id="@+id/pbSignIn"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
@@ -82,6 +92,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -89,14 +100,14 @@
 
 
     <TextView
-        android:onClick="gotoSignUp"
         android:id="@+id/tvGotoSignUp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:text="Don't have an account? Register now"
+        android:onClick="gotoSignUp"
+        android:text="@string/don_t_have_an_account_register_now"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnSignIn" />

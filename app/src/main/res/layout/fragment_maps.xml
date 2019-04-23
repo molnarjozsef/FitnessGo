@@ -1,52 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:weightSum="100"
-    android:orientation="vertical">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="100">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="50"
-        android:weightSum="100"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:weightSum="100">
 
         <TextView
             android:id="@+id/tvUserPoints"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="45"
             android:gravity="center"
             android:text="@string/_0_points"
-            android:textSize="18sp"
-            android:layout_weight="45"/>
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/tvTargetAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="45"
             android:gravity="center"
             android:text="@string/loading_first_location"
-            android:textSize="18sp"
-            android:layout_weight="45"/>
+            android:textSize="18sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="10"
             android:orientation="horizontal">
-            <Button
+
+            <com.ornach.nobobutton.NoboButton
                 android:id="@+id/btnNewTarget"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="10dp"
                 android:layout_weight="10"
-                android:text="@string/generate_new_target_btn" />
+                app:nb_backgroundColor="#8bc34a"
+                app:nb_drawableResource="@drawable/ic_refresh_white_24dp"
+                app:nb_iconPadding="6dp"
+                app:nb_radius="14dp"
+                app:nb_text="@string/generate_new_target_btn"
+                app:nb_textColor="#FFFFFF"
+                app:nb_textSize="14sp"
+                app:nb_textStyle="bold" />
 
-            <Button
+            <com.ornach.nobobutton.NoboButton
                 android:id="@+id/btnClaimPoints"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="10dp"
                 android:layout_weight="10"
-                android:text="@string/claim_points_btn" />
+                app:nb_backgroundColor="#f99809"
+                app:nb_drawableResource="@drawable/ic_target_white_24dp"
+                app:nb_iconPadding="6dp"
+                app:nb_radius="14dp"
+                app:nb_text="@string/claim_points_btn"
+                app:nb_textColor="#FFFFFF"
+                app:nb_textSize="14sp"
+                app:nb_textStyle="bold" />
 
         </LinearLayout>
 
@@ -61,21 +80,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="10"
-                android:text="Save points" />
+                android:text="@string/save_points" />
 
             <Button
                 android:id="@+id/btnLoadPts"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="10"
-                android:text="Load points" />
+                android:text="@string/load_points" />
 
         </LinearLayout>
 
     </LinearLayout>
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:map="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+
+    <fragment xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
