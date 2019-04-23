@@ -1,6 +1,7 @@
 package com.jose.fitnessgo.ui
 
 import android.net.Uri
+import android.opengl.Visibility
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.util.Log
@@ -8,10 +9,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.firebase.firestore.FirebaseFirestore
+import com.jose.fitnessgo.LeaderboardEntry
 import com.jose.fitnessgo.R
+import com.jose.fitnessgo.adapter.LeaderboardAdapter
 import kotlinx.android.synthetic.main.fragment_leaderboard.*
-
-
 
 
 class LeaderBoardFragment : Fragment() {
@@ -29,25 +30,28 @@ class LeaderBoardFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         pbLeaderBoard.visibility = View.VISIBLE
+        rvLeaderboard.adapter = LeaderboardAdapter()
+
         val leaderBoardEntries = hashMapOf<String, Int>()
 
+
+        val leaderboardAdapter = LeaderboardAdapter()
 
         db?.collection("users")
                 ?.get()
                 ?.addOnSuccessListener { result ->
                     for (document in result) {
-                        leaderBoardEntries[(document.get("name") ?: document.get("email")).toString().substringBefore('@')] =
+                        leaderBoardEntries[(document.get("name")
+                                ?: document.get("email")).toString().substringBefore('@')] =
                                 Integer.parseInt(document.get("points")?.toString() ?: "0")
                     }
-                    val leaderBoardResult = leaderBoardEntries.toList().sortedByDescending { (_, value) -> value}.toMap()
+                    val leaderBoardResult = leaderBoardEntries.toList().sortedByDescending { (_, value) -> value }.toMap()
 
                     for (entry in leaderBoardResult) {
-                        tvLeaderBoard.text = resources.getString(
-                                R.string.leaderboard_entry,
-                                tvLeaderBoard.text.toString(),
-                                entry.key,
-                                entry.value)
+                        leaderboardAdapter.addItem(LeaderboardEntry(entry.key, entry.value))
                     }
+
+                    rvLeaderboard.adapter = leaderboardAdapter
                 }
                 ?.addOnFailureListener { exception ->
                     Log.w("TAG_LEADERBOARD", "Error getting documents.", exception)
@@ -55,7 +59,6 @@ class LeaderBoardFragment : Fragment() {
                 ?.addOnCompleteListener {
                     pbLeaderBoard.visibility = View.GONE
                 }
-
 
 
     }
