@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearLayout2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:weightSum="100">
 
-    <LinearLayout
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="50"
@@ -15,83 +17,106 @@
 
         <TextView
             android:id="@+id/tvUserPoints"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="45"
             android:gravity="center"
             android:text="@string/_0_points"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/tvTargetAddress"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/tvTargetAddress"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             android:layout_weight="45"
             android:gravity="center"
             android:text="@string/loading_first_location"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/btnNewTarget"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvUserPoints" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
+
+        <com.ornach.nobobutton.NoboButton
+            android:id="@+id/btnNewTarget"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginBottom="8dp"
             android:layout_weight="10"
-            android:orientation="horizontal">
+            app:layout_constraintBottom_toTopOf="@+id/btnSavePts"
+            app:layout_constraintEnd_toStartOf="@+id/btnClaimPoints"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:nb_backgroundColor="#8bc34a"
+            app:nb_drawableResource="@drawable/ic_refresh_white_24dp"
+            app:nb_iconPadding="6dp"
+            app:nb_radius="14dp"
+            app:nb_text="@string/generate_new_target_btn"
+            app:nb_textColor="#FFFFFF"
+            app:nb_textSize="14sp"
+            app:nb_textStyle="bold" />
 
-            <com.ornach.nobobutton.NoboButton
-                android:id="@+id/btnNewTarget"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:layout_weight="10"
-                app:nb_backgroundColor="#8bc34a"
-                app:nb_drawableResource="@drawable/ic_refresh_white_24dp"
-                app:nb_iconPadding="6dp"
-                app:nb_radius="14dp"
-                app:nb_text="@string/generate_new_target_btn"
-                app:nb_textColor="#FFFFFF"
-                app:nb_textSize="14sp"
-                app:nb_textStyle="bold" />
-
-            <com.ornach.nobobutton.NoboButton
-                android:id="@+id/btnClaimPoints"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:layout_weight="10"
-                app:nb_backgroundColor="#f99809"
-                app:nb_drawableResource="@drawable/ic_target_white_24dp"
-                app:nb_iconPadding="6dp"
-                app:nb_radius="14dp"
-                app:nb_text="@string/claim_points_btn"
-                app:nb_textColor="#FFFFFF"
-                app:nb_textSize="14sp"
-                app:nb_textStyle="bold" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
+        <com.ornach.nobobutton.NoboButton
+            android:id="@+id/btnClaimPoints"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="8dp"
             android:layout_weight="10"
-            android:orientation="horizontal">
+            app:layout_constraintBottom_toTopOf="@+id/btnLoadPts"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/btnNewTarget"
+            app:nb_backgroundColor="#f99809"
+            app:nb_drawableResource="@drawable/ic_target_white_24dp"
+            app:nb_iconPadding="6dp"
+            app:nb_radius="14dp"
+            app:nb_text="@string/claim_points_btn"
+            app:nb_textColor="#FFFFFF"
+            app:nb_textSize="14sp"
+            app:nb_textStyle="bold" />
 
-            <Button
-                android:id="@+id/btnSavePts"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="10"
-                android:text="@string/save_points" />
 
-            <Button
-                android:id="@+id/btnLoadPts"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="10"
-                android:text="@string/load_points" />
+        <Button
+            android:id="@+id/btnSavePts"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_weight="10"
+            android:text="@string/save_points"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnLoadPts"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent" />
 
-        </LinearLayout>
+        <Button
+            android:id="@+id/btnLoadPts"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_weight="10"
+            android:text="@string/load_points"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/btnSavePts" />
 
-    </LinearLayout>
+
+    </android.support.constraint.ConstraintLayout>
 
     <fragment xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/map"
