@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Bundle
 import android.support.design.widget.NavigationView
+import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
@@ -85,18 +86,15 @@ class MainActivity : AppCompatActivity() {
         docRef.get()
                 .addOnSuccessListener { document ->
                     if (document.exists()) {
-                        Toast.makeText(this, "It exists", Toast.LENGTH_LONG).show()
                         profileUserName.text = (document.get("name") ?: " ").toString()
                     } else {
-                        Toast.makeText(this, "It doesnt exist", Toast.LENGTH_LONG).show()
                         val user = HashMap<String, Any>()
                         user["email"] = FirebaseAuth.getInstance().currentUser?.email.toString()
                         db.collection("users").document(FirebaseAuth.getInstance().currentUser?.email.toString()).set(user)
                     }
                 }
                 .addOnFailureListener { exception ->
-                    Toast.makeText(this, "Failed" + exception.message.toString(), Toast.LENGTH_LONG).show()
-
+                    Snackbar.make(drawer_layout, "Getting user data failed.", Snackbar.LENGTH_LONG).show()
                 }
     }
 
