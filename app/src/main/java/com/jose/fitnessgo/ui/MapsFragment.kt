@@ -11,6 +11,7 @@ import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.util.Log
@@ -188,16 +189,16 @@ class MapsFragment : Fragment(){
 
     /**
      * Requests the last known location of the device
-     * @param ocl
+     * @param oclCallback
      */
-    private fun getLastKnownLocation(ocl: OnCompleteListener<Location>) {
+    private fun getLastKnownLocation(oclCallback: OnCompleteListener<Location>) {
         Log.d(TAG, "getLastKnownLocation: called.")
 
         if (ActivityCompat.checkSelfPermission(this.context!!, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat
                         .checkSelfPermission(this.context!!, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return
         }
-        mFusedLocationProviderClient.lastLocation.addOnCompleteListener(ocl)
+        mFusedLocationProviderClient.lastLocation.addOnCompleteListener(oclCallback)
     }
 
     private fun newTargetLocation() {
@@ -296,11 +297,14 @@ class MapsFragment : Fragment(){
             refreshUserPointsView(userPoints)
             savePtsToDb()
         } else {
-            Toast.makeText(this.context,
-                    getString(R.string.not_close_enough) + "\n" +
-                            userLocation.distanceTo(targetLocation).toInt() + " " +
-                            getString(R.string._meters_still_to_go),
-                    Toast.LENGTH_LONG).show()
+            view?.rootView?.let {
+                Snackbar.make(
+                        it,
+                        getString(R.string.not_close_enough) + " " +
+                                userLocation.distanceTo(targetLocation).toInt() + " " +
+                                getString(R.string._meters_still_to_go),
+                        Snackbar.LENGTH_LONG).show()
+            }
         }
     }
 
