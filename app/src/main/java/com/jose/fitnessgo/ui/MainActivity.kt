@@ -25,6 +25,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.jose.fitnessgo.Constants.ERROR_DIALOG_REQUEST
 import com.jose.fitnessgo.Constants.PERMISSIONS_REQUEST_FINE_LOCATION
 import com.jose.fitnessgo.R
+import com.jose.fitnessgo.R.*
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -38,17 +39,17 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(com.jose.fitnessgo.R.layout.activity_main)
-        val toolbar = findViewById<Toolbar>(com.jose.fitnessgo.R.id.toolbar)
+        setContentView(layout.activity_main)
+        val toolbar = findViewById<Toolbar>(id.toolbar)
         setSupportActionBar(toolbar)
 
         val toggle = ActionBarDrawerToggle(this, drawer_layout, toolbar,
-                com.jose.fitnessgo.R.string.navigation_drawer_open, com.jose.fitnessgo.R.string.navigation_drawer_close)
+                string.navigation_drawer_open, string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
 
         if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction().replace(com.jose.fitnessgo.R.id.fragment_container,
+            supportFragmentManager.beginTransaction().replace(id.fragment_container,
                     HomeFragment()).commit()
             //navigationView.setCheckedItem(com.jose.fitnessgo.R.id.nav_message)
         }
@@ -59,18 +60,18 @@ class MainActivity : AppCompatActivity() {
         db = FirebaseFirestore.getInstance()
 
         // Showing email in the drawer header
-        val navigationView: NavigationView = findViewById(R.id.nav_view)
+        val navigationView: NavigationView = findViewById(id.nav_view)
         val headerview: View = navigationView.getHeaderView(0)
-        val profileEmail: TextView = headerview.findViewById(R.id.tvUserEmail)
-        val profileUserName: TextView = headerview.findViewById(R.id.tvUserName)
+        val profileEmail: TextView = headerview.findViewById(id.tvUserEmail)
+        val profileUserName: TextView = headerview.findViewById(id.tvUserName)
         profileEmail.text = auth.currentUser?.email.toString()
 
 
 
         navigationView.setNavigationItemSelectedListener {
-            if(it.itemId == R.id.nav_logout){
+            if (it.itemId == id.nav_logout) {
                 auth.signOut()
-                startActivity(Intent(this,SignInActivity::class.java))
+                startActivity(Intent(this, SignInActivity::class.java))
                 finish()
             }
             return@setNavigationItemSelectedListener true
@@ -79,21 +80,23 @@ class MainActivity : AppCompatActivity() {
 
         // Showing username in the drawer header if available
         // If user profile is not found in the DB, user is added to the DB
-        db.collection("users")
-                .get()
-                .addOnSuccessListener { result ->
-                    for (document in result) {
-                        Log.d("TAG_MAIN_ACTIVITY", document.id + " => " + document.data)
-                        if(document.get("email") == FirebaseAuth.getInstance().currentUser?.email.toString()){
-                            profileUserName.text = (document.get("name") ?: " ").toString()
-                            return@addOnSuccessListener
-                        }
+
+        var docRef = db.collection("users").document(FirebaseAuth.getInstance().currentUser?.email.toString())
+        docRef.get()
+                .addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        Toast.makeText(this, "It exists", Toast.LENGTH_LONG).show()
+                        profileUserName.text = (document.get("name") ?: " ").toString()
+                    } else {
+                        Toast.makeText(this, "It doesnt exist", Toast.LENGTH_LONG).show()
+                        val user = HashMap<String, Any>()
+                        user["email"] = FirebaseAuth.getInstance().currentUser?.email.toString()
+                        db.collection("users").document(FirebaseAuth.getInstance().currentUser?.email.toString()).set(user)
                     }
-                    val user = HashMap<String, Any>()
-                    user["email"] = FirebaseAuth.getInstance().currentUser?.email.toString()
-                    db.collection("users").document(FirebaseAuth.getInstance().currentUser?.email.toString()).set(user)
-                }.addOnFailureListener { exception ->
-                    Log.w("TAG_MAIN_ACTIVITY", "Error getting documents.", exception)
+                }
+                .addOnFailureListener { exception ->
+                    Toast.makeText(this, "Failed" + exception.message.toString(), Toast.LENGTH_LONG).show()
+
                 }
     }
 
@@ -105,10 +108,10 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
     }
 
-    override fun onBackPressed(){
-        if(drawer_layout.isDrawerOpen(GravityCompat.START)){
+    override fun onBackPressed() {
+        if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
-        }else{
+        } else {
             super.onBackPressed()
         }
     }
