@@ -97,7 +97,7 @@ class MainActivity : AppCompatActivity() {
                         db.collection("users").document(FirebaseAuth.getInstance().currentUser?.email.toString()).set(user)
                     }
                 }
-                .addOnFailureListener { exception ->
+                .addOnFailureListener {
                     Snackbar.make(drawer_layout, "Getting user data failed.", Snackbar.LENGTH_LONG).show()
                 }
     }
