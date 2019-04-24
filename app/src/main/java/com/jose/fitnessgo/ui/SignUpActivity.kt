@@ -2,10 +2,10 @@ package com.jose.fitnessgo.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.util.Patterns
 import android.view.View
-import android.widget.Toast
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.jose.fitnessgo.R
@@ -24,33 +24,33 @@ class SignUpActivity : AppCompatActivity() {
         mAuth = FirebaseAuth.getInstance()
     }
 
-    fun signUpOnClick(view: View){
+    fun signUpOnClick(view: View) {
         registerUser()
     }
 
-    private fun registerUser(){
+    private fun registerUser() {
         val email = etEmailSignUp.editText?.text.toString().trim()
         val password = etPasswordSignUp.editText?.text.toString().trim()
 
-        if(email.isEmpty()){
+        if (email.isEmpty()) {
             etEmailSignUp.error = getString(R.string.email_is_required)
             etEmailSignUp.requestFocus()
             return
         }
 
-        if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             etEmailSignUp.error = getString(R.string.enter_a_valid_email)
             etEmailSignUp.requestFocus()
             return
         }
 
-        if(password.isEmpty()){
+        if (password.isEmpty()) {
             etPasswordSignUp.error = getString(R.string.pw_is_required)
             etPasswordSignUp.requestFocus()
             return
         }
 
-        if(password.length < 8){
+        if (password.length < 8) {
             etPasswordSignUp.error = getString(R.string.pw_must_be_at_least_8_chars)
             etPasswordSignUp.requestFocus()
             return
@@ -58,17 +58,17 @@ class SignUpActivity : AppCompatActivity() {
 
         pbSignUp.visibility = View.VISIBLE
 
-        mAuth?.createUserWithEmailAndPassword(email,password)
+        mAuth?.createUserWithEmailAndPassword(email, password)
                 ?.addOnSuccessListener {
-                    Toast.makeText(this, "Registration successful", Toast.LENGTH_LONG).show()
-
                     val loginIntent = Intent(this, MainActivity::class.java)
                     loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                    loginIntent.putExtra("KEY_MESSAGE","Registration successful")
                     startActivity(loginIntent)
                 }
                 ?.addOnFailureListener {
-                    Toast.makeText(this, "Registration unsuccessful: " +
-                            "${it.message}", Toast.LENGTH_LONG).show()
+                    Snackbar.make(clSignup, "Registration unsuccessful: " +
+                            "${it.message}", Snackbar.LENGTH_LONG).show()
+
                 }
                 ?.addOnCompleteListener {
                     pbSignUp.visibility = View.GONE
@@ -76,7 +76,6 @@ class SignUpActivity : AppCompatActivity() {
 
 
     }
-
 
 
 }

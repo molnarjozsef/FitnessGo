@@ -2,14 +2,13 @@ package com.jose.fitnessgo.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.util.Patterns
 import android.view.View
-import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.jose.fitnessgo.R
 import kotlinx.android.synthetic.main.activity_sign_in.*
-
 
 
 class SignInActivity : AppCompatActivity() {
@@ -67,12 +66,13 @@ class SignInActivity : AppCompatActivity() {
 
                     val loginIntent = Intent(this, MainActivity::class.java)
                     loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                    loginIntent.putExtra("KEY_MESSAGE","Login successful")
                     startActivity(loginIntent)
 
                 }
                 ?.addOnFailureListener {
-                    Toast.makeText(this, "Login unsuccessful: " +
-                            "${it.message}", Toast.LENGTH_LONG).show()
+                    Snackbar.make(clSignin, "Login unsuccessful: " +
+                            "${it.message}", Snackbar.LENGTH_LONG).show()
                 }
                 ?.addOnCompleteListener {
                     pbSignIn.visibility = View.GONE

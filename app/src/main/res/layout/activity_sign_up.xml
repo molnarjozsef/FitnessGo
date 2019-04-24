@@ -2,6 +2,7 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/clSignup"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.SignUpActivity">
@@ -40,10 +41,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etEmailSignUp"
         app:passwordToggleEnabled="true">
+
         <android.support.design.widget.TextInputEditText
-            android:inputType="textPassword"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:inputType="textPassword" />
     </android.support.design.widget.TextInputLayout>
 
     <com.ornach.nobobutton.NoboButton
@@ -53,20 +55,19 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        app:nb_text="@string/sign_up"
-        app:nb_backgroundColor= "#30C08F"
-        app:nb_radius="14dp"
-        app:nb_textColor="#FFFFFF"
-        app:nb_textStyle="bold"
-        app:nb_drawableResource="@drawable/ic_account_plus_white_24dp"
-        app:nb_iconPadding="8dp"
-        app:nb_textSize="14sp"
+        android:onClick="signUpOnClick"
         android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etPasswordSignUp"
-        android:onClick="signUpOnClick"
-        />
+        app:nb_backgroundColor="#30C08F"
+        app:nb_drawableResource="@drawable/ic_account_plus_white_24dp"
+        app:nb_iconPadding="8dp"
+        app:nb_radius="14dp"
+        app:nb_text="@string/sign_up"
+        app:nb_textColor="#FFFFFF"
+        app:nb_textSize="14sp"
+        app:nb_textStyle="bold" />
 
     <TextView
         android:id="@+id/tvSignUp"
@@ -85,7 +86,6 @@
         app:layout_constraintVertical_bias="0.94" />
 
     <ProgressBar
-        android:visibility="gone"
         android:id="@+id/pbSignUp"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
@@ -94,6 +94,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

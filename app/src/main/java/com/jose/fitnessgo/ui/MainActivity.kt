@@ -25,7 +25,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.jose.fitnessgo.Constants.ERROR_DIALOG_REQUEST
 import com.jose.fitnessgo.Constants.PERMISSIONS_REQUEST_FINE_LOCATION
-import com.jose.fitnessgo.R
 import com.jose.fitnessgo.R.*
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -55,6 +54,10 @@ class MainActivity : AppCompatActivity() {
             //navigationView.setCheckedItem(com.jose.fitnessgo.R.id.nav_message)
         }
 
+        intent.getStringExtra("KEY_MESSAGE")?.let {
+            Snackbar.make(drawer_layout,it,Snackbar.LENGTH_LONG).show()
+        }
+
 
         // Firebase, firestore instances
         auth = FirebaseAuth.getInstance()
@@ -82,12 +85,13 @@ class MainActivity : AppCompatActivity() {
         // Showing username in the drawer header if available
         // If user profile is not found in the DB, user is added to the DB
 
-        var docRef = db.collection("users").document(FirebaseAuth.getInstance().currentUser?.email.toString())
+        val docRef = db.collection("users").document(FirebaseAuth.getInstance().currentUser?.email.toString())
         docRef.get()
                 .addOnSuccessListener { document ->
                     if (document.exists()) {
                         profileUserName.text = (document.get("name") ?: " ").toString()
                     } else {
+                        profileUserName.text = ""
                         val user = HashMap<String, Any>()
                         user["email"] = FirebaseAuth.getInstance().currentUser?.email.toString()
                         db.collection("users").document(FirebaseAuth.getInstance().currentUser?.email.toString()).set(user)
