@@ -3,27 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <group android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_message"
-            android:icon="@drawable/ic_directions_run_black_24dp"
-            android:title="Message" />
-        <item
-            android:id="@+id/nav_chat"
-            android:icon="@drawable/ic_attach_file_black_24dp"
-            android:title="Chat" />
-        <item
-            android:id="@+id/nav_profile"
-            android:icon="@drawable/ic_control_point_black_24dp"
-            android:title="Profile" />
-    </group>
 
-    <item android:title="Communicate">
+
+    <item android:title="Account">
         <menu>
-            <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_attach_money_black_24dp"
-                android:title="Share" />
             <item
                 android:id="@+id/nav_logout"
                 android:icon="@drawable/ic_logout_black_24dp"
