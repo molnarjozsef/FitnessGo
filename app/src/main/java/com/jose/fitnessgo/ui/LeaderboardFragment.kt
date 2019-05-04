@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.google.firebase.firestore.FirebaseFirestore
 import com.jose.fitnessgo.LeaderboardEntry
+import com.jose.fitnessgo.MarginItemDecoration
 import com.jose.fitnessgo.R
 import com.jose.fitnessgo.adapter.LeaderboardAdapter
 import kotlinx.android.synthetic.main.fragment_leaderboard.*
@@ -30,6 +31,9 @@ class LeaderboardFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         pbLeaderBoard.visibility = View.VISIBLE
         rvLeaderboard.adapter = LeaderboardAdapter()
+        rvLeaderboard.addItemDecoration(MarginItemDecoration(
+                resources.getDimension(R.dimen.default_padding).toInt()))
+
 
         val leaderboardEntries = hashMapOf<String, Int>()
 
