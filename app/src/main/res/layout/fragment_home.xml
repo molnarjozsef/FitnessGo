@@ -104,7 +104,7 @@
                     <ImageView
                         android:layout_width="64dp"
                         android:layout_height="64dp"
-                        android:background="@drawable/cerclebackgroundpurple"
+                        android:background="@drawable/cerclebackgroundyello"
                         android:padding="10dp"
                         android:src="@drawable/ic_settings_black_24dp" />
 

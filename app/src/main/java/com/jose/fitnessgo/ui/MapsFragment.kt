@@ -48,6 +48,7 @@ class MapsFragment : Fragment(){
     private val targetLocation = Location(LocationManager.GPS_PROVIDER)
     private var userPoints: Int = 0
     private val filter = IntentFilter("com.jose.fitnessgo.ProximityAlert")
+    private val newTargetPointPenalty = 100
 
 
     private lateinit var db: FirebaseFirestore
@@ -85,7 +86,28 @@ class MapsFragment : Fragment(){
 
 
         btnNewTarget.setOnClickListener{
-            getLastKnownLocation(oclNewTarget)
+            when(userPoints){
+                in 0..newTargetPointPenalty -> {
+                    view.rootView?.let {
+                        Snackbar.make(
+                                it,
+                                "Not enough points. You need to have ${newTargetPointPenalty
+                                        - userPoints} more points to get a new target.",
+                                Snackbar.LENGTH_LONG
+                        ).show()
+                    }
+                }
+                else -> {
+                    userPoints -= newTargetPointPenalty
+                    refreshUserPointsView(userPoints)
+                    savePtsToDb()
+                    getLastKnownLocation(oclNewTarget)
+                }
+
+            }
+
+
+
         }
 
         btnClaimPoints.setOnClickListener{

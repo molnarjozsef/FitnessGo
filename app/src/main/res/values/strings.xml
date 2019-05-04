@@ -47,4 +47,5 @@
     <string name="don_t_have_an_account_register_now">Don\'t have an account? Register now</string>
     <string name="load_points">Load points</string>
     <string name="save_points">Save points</string>
+    <string name="sign_in_to_continue">Sign in to continue</string>
 </resources>

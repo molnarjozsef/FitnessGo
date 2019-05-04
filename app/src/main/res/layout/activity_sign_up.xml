@@ -60,7 +60,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etPasswordSignUp"
-        app:nb_backgroundColor="#30C08F"
+        app:nb_backgroundColor="@color/accent"
         app:nb_drawableResource="@drawable/ic_account_plus_white_24dp"
         app:nb_iconPadding="8dp"
         app:nb_radius="14dp"
