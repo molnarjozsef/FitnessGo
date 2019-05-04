@@ -33,7 +33,7 @@ import kotlinx.android.synthetic.main.fragment_maps.*
 import java.io.IOException
 import java.util.*
 
-class MapsFragment : Fragment(){
+class MapsFragment : Fragment() {
 
 
     private var mMap: GoogleMap? = null
@@ -72,7 +72,7 @@ class MapsFragment : Fragment(){
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
-        mapFragment?.getMapAsync{onMapReady(it)}
+        mapFragment?.getMapAsync { onMapReady(it) }
 
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this.activity!!)
         db = FirebaseFirestore.getInstance()
@@ -85,17 +85,15 @@ class MapsFragment : Fragment(){
 
 
 
-        btnNewTarget.setOnClickListener{
-            when(userPoints){
+        btnNewTarget.setOnClickListener {
+            when (userPoints) {
                 in 0..newTargetPointPenalty -> {
-                    clLayoutMapsFragment.let {
-                        Snackbar.make(
-                                it,
-                                "Not enough points. You need to have ${newTargetPointPenalty
-                                        - userPoints} more points to get a new target.",
-                                Snackbar.LENGTH_LONG
-                        ).show()
-                    }
+                    Snackbar.make(
+                            clLayoutMapsFragment,
+                            "Not enough points. You need to have ${newTargetPointPenalty
+                                    - userPoints} more points to get a new target.",
+                            Snackbar.LENGTH_LONG
+                    ).show()
                 }
                 else -> {
                     userPoints -= newTargetPointPenalty
@@ -107,10 +105,9 @@ class MapsFragment : Fragment(){
             }
 
 
-
         }
 
-        btnClaimPoints.setOnClickListener{
+        btnClaimPoints.setOnClickListener {
             getLastKnownLocation(oclClaimPoints)
         }
 
@@ -131,8 +128,8 @@ class MapsFragment : Fragment(){
     /**
      * Updates the TextView that shows the user points from the Integer parameter
      */
-    fun refreshUserPointsView(pts: Int){
-        tvUserPoints.text = resources.getString(R.string._points,pts)
+    fun refreshUserPointsView(pts: Int) {
+        tvUserPoints.text = resources.getString(R.string._points, pts)
     }
 
 
@@ -140,7 +137,7 @@ class MapsFragment : Fragment(){
      * Loads the user points from the Firestore cloud database
      * updates the points in the userPoints variable of this activity
      */
-    private fun loadPtsFromDb(){
+    private fun loadPtsFromDb() {
         db.collection("users")
                 .document(FirebaseAuth.getInstance().currentUser?.email.toString())
                 .get()
@@ -164,7 +161,7 @@ class MapsFragment : Fragment(){
     /**
      * Updates the "points" value in the user's Firestore document with the current points
      */
-    fun savePtsToDb(){
+    fun savePtsToDb() {
 
         val userPtsData = HashMap<String, Any>()
         userPtsData["email"] = FirebaseAuth.getInstance().currentUser?.email.toString()
@@ -175,8 +172,6 @@ class MapsFragment : Fragment(){
                 //?.add(user)
                 .update(userPtsData)
     }
-
-
 
 
     /**
@@ -310,15 +305,14 @@ class MapsFragment : Fragment(){
             refreshUserPointsView(userPoints)
             savePtsToDb()
         } else {
-            view?.rootView?.let {
-                Snackbar.make(
-                        it,
-                        getString(R.string.not_close_enough) + " " +
-                                userLocation.distanceTo(targetLocation).toInt() + " " +
-                                getString(R.string._meters_still_to_go),
-                        Snackbar.LENGTH_LONG).show()
-            }
+            Snackbar.make(
+                    clLayoutMapsFragment,
+                    getString(R.string.not_close_enough) + " " +
+                            userLocation.distanceTo(targetLocation).toInt() + " " +
+                            getString(R.string._meters_still_to_go),
+                    Snackbar.LENGTH_LONG).show()
         }
+
     }
 
     /**
@@ -334,7 +328,6 @@ class MapsFragment : Fragment(){
     }
 
 
-
     /**
      * A BroadcastReceiver for the Proximity alert PendingIntent
      */
@@ -343,7 +336,7 @@ class MapsFragment : Fragment(){
 
             tvTargetAddress?.append("\n\n Destination reached!")
             userPoints = calculateNewPoints(userPoints, System.currentTimeMillis(), startTimeOfRound)
-            tvUserPoints?.let {refreshUserPointsView(userPoints)}
+            tvUserPoints?.let { refreshUserPointsView(userPoints) }
             savePtsToDb()
         }
     }

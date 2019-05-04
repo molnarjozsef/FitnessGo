@@ -1,62 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_height="match_parent"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/clLayoutMapsFragment"
     android:layout_width="match_parent"
-    android:weightSum="100"
-    android:orientation="horizontal">
+    android:layout_height="match_parent">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="50"
-        android:weightSum="100"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/tvUserPoints"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/_0_points"
-            android:textSize="18sp"
-            android:layout_weight="45"/>
-
-        <TextView
-            android:id="@+id/tvTargetAddress"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/loading_first_location"
-            android:textSize="18sp"
-            android:layout_weight="45"/>
+        android:orientation="horizontal"
+        android:weightSum="100">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="10"
-            android:orientation="horizontal">
-            <Button
-                android:id="@+id/btnNewTarget"
+            android:layout_height="match_parent"
+            android:layout_weight="50"
+            android:orientation="vertical"
+            android:weightSum="100">
+
+            <TextView
+                android:id="@+id/tvUserPoints"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="45"
+                android:gravity="center"
+                android:text="@string/_0_points"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/tvTargetAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="45"
+                android:gravity="center"
+                android:text="@string/loading_first_location"
+                android:textSize="18sp" />
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="10"
-                android:text="@string/generate_new_target_btn" />
-            <Button
-                android:id="@+id/btnClaimPoints"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="10"
-                android:text="@string/claim_points_btn" />
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnNewTarget"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="10"
+                    android:text="@string/generate_new_target_btn" />
+
+                <Button
+                    android:id="@+id/btnClaimPoints"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="10"
+                    android:text="@string/claim_points_btn" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="50"
+            tools:context=".ui.MapsActivity" />
     </LinearLayout>
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:map="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="50"
-        tools:context=".ui.MapsActivity" />
-</LinearLayout>
+
+</android.support.design.widget.CoordinatorLayout>
