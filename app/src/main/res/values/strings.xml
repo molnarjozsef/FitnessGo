@@ -38,7 +38,7 @@
     <string name="pw_is_required">Password is required</string>
     <string name="set_a_unique_username">Set a unique username</string>
     <string name="log_out">Log out</string>
-    <string name="set_username">Set username</string>
+    <string name="save_username">Save username</string>
     <string name="password">password</string>
     <string name="sign_in">Sign in</string>
     <string name="sign_up">Sign up</string>

@@ -92,14 +92,6 @@ class MapsFragment : Fragment(){
             getLastKnownLocation(oclClaimPoints)
         }
 
-        btnSavePts?.setOnClickListener{
-            savePtsToDb()
-        }
-
-        btnLoadPts?.setOnClickListener{
-            loadPtsFromDb()
-        }
-
     }
 
     override fun onResume() {

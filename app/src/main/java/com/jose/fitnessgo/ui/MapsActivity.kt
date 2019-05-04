@@ -74,13 +74,6 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
             getLastKnownLocation(oclClaimPoints)
         }
 
-        btnSavePts?.setOnClickListener{
-            savePtsToDb()
-        }
-
-        btnLoadPts?.setOnClickListener{
-            loadPtsFromDb()
-        }
 
 
         val filter = IntentFilter("com.jose.fitnessgo.ProximityAlert")

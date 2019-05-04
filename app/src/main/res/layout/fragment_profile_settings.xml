@@ -35,14 +35,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
-    <Button
+    <com.ornach.nobobutton.NoboButton
         android:id="@+id/btnSetUserName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:text="@string/set_username"
+        app:nb_backgroundColor= "#03A9F4"
+        app:nb_text="@string/save_username"
+        app:nb_radius="14dp"
+        app:nb_textColor="#FFFFFF"
+        app:nb_textStyle="bold"
+        app:nb_drawableResource="@drawable/ic_content_save_white_24dp"
+        app:nb_iconPadding="8dp"
+        app:nb_textSize="14sp"
+        android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etUsername" />

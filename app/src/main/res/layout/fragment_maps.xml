@@ -54,7 +54,7 @@
             android:layout_marginStart="24dp"
             android:layout_marginBottom="8dp"
             android:layout_weight="10"
-            app:layout_constraintBottom_toTopOf="@+id/btnSavePts"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/btnClaimPoints"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
@@ -75,7 +75,7 @@
             android:layout_marginEnd="24dp"
             android:layout_marginBottom="8dp"
             android:layout_weight="10"
-            app:layout_constraintBottom_toTopOf="@+id/btnLoadPts"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/btnNewTarget"
@@ -87,33 +87,6 @@
             app:nb_textColor="#FFFFFF"
             app:nb_textSize="14sp"
             app:nb_textStyle="bold" />
-
-
-        <Button
-            android:id="@+id/btnSavePts"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_weight="10"
-            android:text="@string/save_points"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btnLoadPts"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <Button
-            android:id="@+id/btnLoadPts"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_weight="10"
-            android:text="@string/load_points"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/btnSavePts" />
 
 
     </android.support.constraint.ConstraintLayout>
