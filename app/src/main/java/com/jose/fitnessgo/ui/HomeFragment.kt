@@ -31,7 +31,7 @@ class HomeFragment : Fragment() {
             activity?.supportFragmentManager
                     ?.beginTransaction()
                     ?.addToBackStack(null)
-                    ?.replace(com.jose.fitnessgo.R.id.fragment_container, LeaderBoardFragment())
+                    ?.replace(com.jose.fitnessgo.R.id.fragment_container, LeaderboardFragment())
                     ?.commit()
         }
         cvProfileSettings.setOnClickListener {

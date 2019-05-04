@@ -1,7 +1,6 @@
 package com.jose.fitnessgo.ui
 
 import android.net.Uri
-import android.opengl.Visibility
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.util.Log
@@ -15,7 +14,7 @@ import com.jose.fitnessgo.adapter.LeaderboardAdapter
 import kotlinx.android.synthetic.main.fragment_leaderboard.*
 
 
-class LeaderBoardFragment : Fragment() {
+class LeaderboardFragment : Fragment() {
 
 
     private var db: FirebaseFirestore? = null
@@ -32,7 +31,7 @@ class LeaderBoardFragment : Fragment() {
         pbLeaderBoard.visibility = View.VISIBLE
         rvLeaderboard.adapter = LeaderboardAdapter()
 
-        val leaderBoardEntries = hashMapOf<String, Int>()
+        val leaderboardEntries = hashMapOf<String, Int>()
 
 
         val leaderboardAdapter = LeaderboardAdapter()
@@ -41,11 +40,11 @@ class LeaderBoardFragment : Fragment() {
                 ?.get()
                 ?.addOnSuccessListener { result ->
                     for (document in result) {
-                        leaderBoardEntries[(document.get("name")
+                        leaderboardEntries[(document.get("name")
                                 ?: document.get("email")).toString().substringBefore('@')] =
                                 Integer.parseInt(document.get("points")?.toString() ?: "0")
                     }
-                    val leaderBoardResult = leaderBoardEntries.toList().sortedByDescending { (_, value) -> value }.toMap()
+                    val leaderBoardResult = leaderboardEntries.toList().sortedByDescending { (_, value) -> value }.toMap()
 
                     for (entry in leaderBoardResult) {
                         leaderboardAdapter.addItem(LeaderboardEntry(entry.key, entry.value))

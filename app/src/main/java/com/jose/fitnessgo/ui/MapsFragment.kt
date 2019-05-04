@@ -88,7 +88,7 @@ class MapsFragment : Fragment(){
         btnNewTarget.setOnClickListener{
             when(userPoints){
                 in 0..newTargetPointPenalty -> {
-                    view.rootView?.let {
+                    clLayoutMapsFragment.let {
                         Snackbar.make(
                                 it,
                                 "Not enough points. You need to have ${newTargetPointPenalty
