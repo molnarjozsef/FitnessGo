@@ -300,9 +300,30 @@ class MapsFragment : Fragment() {
             userLocation = task.result ?: userLocation
         }
         if (userLocation.distanceTo(targetLocation) < EXPECTED_RANGE_TO_TARGET) {
-            userPoints = calculateNewPoints(userPoints, System.currentTimeMillis(), startTimeOfRound)
+            val newPoints = calculateNewPoints(userPoints, System.currentTimeMillis(), startTimeOfRound)
+            userPoints += newPoints
             refreshUserPointsView(userPoints)
             savePtsToDb()
+            when (newPoints) {
+                0 -> {
+                    Snackbar.make(
+                            clLayoutMapsFragment,
+                            getString(R.string.congratulations_zero_points),
+                            Snackbar.LENGTH_LONG).show()
+                }
+                1 -> {
+                    Snackbar.make(
+                            clLayoutMapsFragment,
+                            getString(R.string.congratulations_one_point),
+                            Snackbar.LENGTH_LONG).show()
+                }
+                else -> {
+                    Snackbar.make(
+                            clLayoutMapsFragment,
+                            getString(R.string.congratulations_you_scored__points, newPoints),
+                            Snackbar.LENGTH_LONG).show()
+                }
+            }
         } else {
             Snackbar.make(
                     clLayoutMapsFragment,

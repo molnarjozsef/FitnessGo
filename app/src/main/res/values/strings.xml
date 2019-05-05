@@ -47,4 +47,10 @@
     <string name="save_points">Save points</string>
     <string name="sign_in_to_continue">Sign in to continue</string>
     <string name="username">Username</string>
+    <string name="congratulations">Congratulations!</string>
+    <string name="you_scored_">You scored</string>
+    <string name="congratulations_you_scored__points">Congratulations! You scored %1$d points</string>
+    <string name="congratulations_one_point">Congratulations! You earned a point!</string>
+    <string name="congratulations_zero_points">Congratulations! You finished this round, but try to be faster, so next time you\'ll earn some points!</string>
+
 </resources>
