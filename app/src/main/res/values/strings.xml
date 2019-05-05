@@ -3,8 +3,6 @@
     <string name="title_activity_maps">Map</string>
 
     <string name="title_activity_fullscreen">FullscreenActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="title_activity_main">Fitness Go</string>
 
     <string name="hello_blank_fragment" />
@@ -39,13 +37,14 @@
     <string name="set_a_unique_username">Set a unique username</string>
     <string name="log_out">Log out</string>
     <string name="save_username">Save username</string>
-    <string name="password">password</string>
+    <string name="password">Password</string>
     <string name="sign_in">Sign in</string>
     <string name="sign_up">Sign up</string>
-    <string name="email_address">email address</string>
+    <string name="email_address">Email address</string>
     <string name="sign_up_to_continue">Sign up to continue</string>
     <string name="don_t_have_an_account_register_now">Don\'t have an account? Register now</string>
     <string name="load_points">Load points</string>
     <string name="save_points">Save points</string>
     <string name="sign_in_to_continue">Sign in to continue</string>
+    <string name="username">Username</string>
 </resources>

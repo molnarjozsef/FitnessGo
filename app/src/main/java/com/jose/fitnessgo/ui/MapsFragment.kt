@@ -213,7 +213,6 @@ class MapsFragment : Fragment() {
         targetLatLng = LatLng(userLocation.latitude - 0.0025 + Math.random() * 0.005,
                 userLocation.longitude - 0.0025 * 1.48 + Math.random() * 0.005 * 1.48)
 
-
         val geocoder = Geocoder(this.activity, Locale.getDefault())
 
         try {
