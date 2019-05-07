@@ -103,8 +103,10 @@ class MapsFragment : Fragment() {
                 }
 
             }
+        }
 
-
+        btnNextRound?.setOnClickListener {
+            getLastKnownLocation(oclNewTarget)
         }
 
         btnClaimPoints.setOnClickListener {
@@ -266,7 +268,10 @@ class MapsFragment : Fragment() {
 
 
         // Re-enabling the Claim Points button, because the new location's points were not yet claimed
-        btnClaimPoints?.isEnabled = true
+        btnClaimPoints.isEnabled = true
+        btnNewTarget.isEnabled = true
+        // Making the nextround button gone
+        btnNextRound?.visibility = View.GONE
     }
 
 
@@ -274,7 +279,7 @@ class MapsFragment : Fragment() {
      * This function should be called when the user gets to the target location
      * It calculates the earned points, and gives it back
      */
-    internal fun calculateNewPoints(userPts: Int, currentTime: Long, prevTime: Long): Int {
+    internal fun calculateNewPoints(currentTime: Long, prevTime: Long): Int {
 
         val timeTaken = currentTime - prevTime
 
@@ -285,8 +290,9 @@ class MapsFragment : Fragment() {
         }
 
         //Disabling the Claim Points button, because the points were already given to the user
-        btnClaimPoints?.isEnabled = false
-        return (userPts + earnedPoints).toInt()
+        btnClaimPoints.isEnabled = false
+        btnNewTarget.isEnabled = false
+        return earnedPoints.toInt()
     }
 
     /**
@@ -300,30 +306,11 @@ class MapsFragment : Fragment() {
             userLocation = task.result ?: userLocation
         }
         if (userLocation.distanceTo(targetLocation) < EXPECTED_RANGE_TO_TARGET) {
-            val newPoints = calculateNewPoints(userPoints, System.currentTimeMillis(), startTimeOfRound)
-            userPoints += newPoints
-            refreshUserPointsView(userPoints)
-            savePtsToDb()
-            when (newPoints) {
-                0 -> {
-                    Snackbar.make(
-                            clLayoutMapsFragment,
-                            getString(R.string.congratulations_zero_points),
-                            Snackbar.LENGTH_LONG).show()
-                }
-                1 -> {
-                    Snackbar.make(
-                            clLayoutMapsFragment,
-                            getString(R.string.congratulations_one_point),
-                            Snackbar.LENGTH_LONG).show()
-                }
-                else -> {
-                    Snackbar.make(
-                            clLayoutMapsFragment,
-                            getString(R.string.congratulations_you_scored__points, newPoints),
-                            Snackbar.LENGTH_LONG).show()
-                }
-            }
+            val lm = this.context!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            lm.removeProximityAlert(proxPendIntent)
+
+
+
         } else {
             Snackbar.make(
                     clLayoutMapsFragment,
@@ -333,6 +320,29 @@ class MapsFragment : Fragment() {
                     Snackbar.LENGTH_LONG).show()
         }
 
+    }
+
+    private fun showNewPointsSnackbar(newPoints: Int) {
+        when (newPoints) {
+            0 -> {
+                Snackbar.make(
+                        clLayoutMapsFragment,
+                        getString(R.string.congratulations_zero_points),
+                        Snackbar.LENGTH_LONG).show()
+            }
+            1 -> {
+                Snackbar.make(
+                        clLayoutMapsFragment,
+                        getString(R.string.congratulations_one_point),
+                        Snackbar.LENGTH_LONG).show()
+            }
+            else -> {
+                Snackbar.make(
+                        clLayoutMapsFragment,
+                        getString(R.string.congratulations_you_scored__points, newPoints),
+                        Snackbar.LENGTH_LONG).show()
+            }
+        }
     }
 
     /**
@@ -353,12 +363,19 @@ class MapsFragment : Fragment() {
      */
     inner class AlertOnProximityReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-
-            tvTargetAddress?.append("\n\n Destination reached!")
-            userPoints = calculateNewPoints(userPoints, System.currentTimeMillis(), startTimeOfRound)
-            tvUserPoints?.let { refreshUserPointsView(userPoints) }
-            savePtsToDb()
+            roundFinished()
         }
+    }
+
+    fun roundFinished(){
+        tvTargetAddress?.append("\n\n Destination reached!")
+        val newPoints = calculateNewPoints(System.currentTimeMillis(), startTimeOfRound)
+        userPoints += newPoints
+        tvUserPoints?.let { refreshUserPointsView(userPoints) }
+        savePtsToDb()
+        showNewPointsSnackbar(newPoints)
+        btnNextRound?.visibility = View.VISIBLE
+
     }
 
     companion object {

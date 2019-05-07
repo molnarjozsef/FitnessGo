@@ -52,5 +52,6 @@
     <string name="congratulations_you_scored__points">Congratulations! You scored %1$d points</string>
     <string name="congratulations_one_point">Congratulations! You earned a point!</string>
     <string name="congratulations_zero_points">Congratulations! You finished this round, but try to be faster, so next time you\'ll earn some points!</string>
+    <string name="start_next_round">Start next round</string>
 
 </resources>
