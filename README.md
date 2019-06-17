@@ -1,10 +1,10 @@
 # FitnessGo
 A fitness application based on Pokemon Go
 
-# Bemutatás
+## Bemutatás
 Az alkalmazás egy fitnesz program, melyhez az ötletet a Pokemon Go nevű játék adta. Ennek az alkalmazásnak szintén van egy olyan játékmódja, melyben a felhasználónak a valós tér különböző helyszíneire kell elmennie, hogy pontokat szerezzen, azonban itt a kritikus tényező az, hogy mennyire gyorsan jut el a helyszínre. Ezáltal a játékos ösztönözve van a futásra, így a sportolás játékká válik számára. A fő célközönség olyan aktívkorúak, akik nehezen veszik rá magukat a sportra, azonban nosztalgikusan gondolnak vissza a Pokemon játékokkal eltöltött gyerekkorukra.
 
-# Főbb funkciók
+## Főbb funkciók
 Az alkalmazásban található egy GridView alapú főmenü, melyekből az alfunkciók indíthatók. Balról előhúzható egy drawer menü, melyben a belépett felhasználó információi láthatók, valamint a kijelentkezés lehetősége. Az alkalmazás egy login activityvel indít, melyből elérhető a regisztrációs activity is. A felhasználókezelés emailcím és jelszó alapján történik a Firebase Auth segítségével.
 
 Ezeken túljutva találja magát a felhasználó a főmenüben. A legfontosabb választható menüpont maga a játék, melyben a képernyő egy részén egy Google Maps MapView segítségével látható a felhasználó aktuális környezete, melyet a GPS koordináták alapján talál meg az alkalmazás. A játék a felhasználó környezetéből egy véletlenszerű pontot választ a térképen, a felhasználó feladata pedig ennek a pontnak a 100 méteres sugarán belül kerülni minél hamarabb. Minél kevesebb idő telik el a feladat kiosztása és a teljesítése között, annál több ponttal van jutalmazva a felhasználó.
@@ -17,7 +17,7 @@ Egy másik, a főmenüből elérhető funkció a Leaderboard, azaz a ranglista, 
 
 A harmadik, főmenüből elérhető funkció pedig a profilbeállítások, ahol a felhasználó kiválaszthatja azt a nevet, melyet a játék során használ, a drawer menüben is lát, valamint ez jelenik meg a többi felhasználó számára a ranglistán is a játékos elért pontszáma mellett.
 
-# Felhasznált technológiák
+## Felhasznált technológiák
 - Explicit Intent segítségével történő váltás a belépő, a regisztrációs és főmenü Activityk között
 - A főmenü CardView segítségével került összeállításra
 - Az alkalmazás a bejelentkező és a regisztrációs Activityn kívül egyetlen home Activityt használ, a különböző képernyők egy-egy Fragmentként jelennek meg
