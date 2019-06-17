@@ -3,12 +3,18 @@ A fitness application based on Pokemon Go
 
 # Bemutatás
 Az alkalmazás egy fitnesz program, melyhez az ötletet a Pokemon Go nevű játék adta. Ennek az alkalmazásnak szintén van egy olyan játékmódja, melyben a felhasználónak a valós tér különböző helyszíneire kell elmennie, hogy pontokat szerezzen, azonban itt a kritikus tényező az, hogy mennyire gyorsan jut el a helyszínre. Ezáltal a játékos ösztönözve van a futásra, így a sportolás játékká válik számára. A fő célközönség olyan aktívkorúak, akik nehezen veszik rá magukat a sportra, azonban nosztalgikusan gondolnak vissza a Pokemon játékokkal eltöltött gyerekkorukra.
-Főbb funkciók
+
+# Főbb funkciók
 Az alkalmazásban található egy GridView alapú főmenü, melyekből az alfunkciók indíthatók. Balról előhúzható egy drawer menü, melyben a belépett felhasználó információi láthatók, valamint a kijelentkezés lehetősége. Az alkalmazás egy login activityvel indít, melyből elérhető a regisztrációs activity is. A felhasználókezelés emailcím és jelszó alapján történik a Firebase Auth segítségével.
+
 Ezeken túljutva találja magát a felhasználó a főmenüben. A legfontosabb választható menüpont maga a játék, melyben a képernyő egy részén egy Google Maps MapView segítségével látható a felhasználó aktuális környezete, melyet a GPS koordináták alapján talál meg az alkalmazás. A játék a felhasználó környezetéből egy véletlenszerű pontot választ a térképen, a felhasználó feladata pedig ennek a pontnak a 100 méteres sugarán belül kerülni minél hamarabb. Minél kevesebb idő telik el a feladat kiosztása és a teljesítése között, annál több ponttal van jutalmazva a felhasználó.
+
 A célpont megközelítését az alkalmazás egy PendingIntent és egy BroadcastReceiver segítségével figyeli, de a felhasználónak is lehetősége van kérni a pontok jóváhagyását, amennyiben a célpontot legalább 100 méterre megközelítette. Az összegyűjtött pontszámot a felhasználó saját Firestore dokumentumában tárolja a rendszer, melybe automatikusan mentésre kerülnek az adatok, és a játék indításakor a betöltés is magától végbemegy.
+
 A felhasználó érdekében a véletlenül kisorsolt célkoordinátát az alkalmazás először reverse geocodingolja, azaz megkeresi a hozzá tartozó legközelebbi érvényes címet, és ebből geocoding segítségével visszafejt egy olyan koordinátát, melyet a felhasználó közúton már elérhet. Ez a koordináta megjelenítésre kerül a térképen, valamint a hozzá tartozó címet is kiírja a játék a felhasználó addigi pontszáma alatt.
+
 Egy másik, a főmenüből elérhető funkció a Leaderboard, azaz a ranglista, ahol az összes felhasználó közül a legjobbak neve és pontszáma jelenik meg, csökkenő sorrendben. Ez RecyclerView segítségével van megvalósítva.
+
 A harmadik, főmenüből elérhető funkció pedig a profilbeállítások, ahol a felhasználó kiválaszthatja azt a nevet, melyet a játék során használ, a drawer menüben is lát, valamint ez jelenik meg a többi felhasználó számára a ranglistán is a játékos elért pontszáma mellett.
 
 # Felhasznált technológiák
