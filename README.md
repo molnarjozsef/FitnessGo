@@ -1,5 +1,4 @@
 # FitnessGo
-A fitness application based on Pokemon Go
 
 ## Bemutatás
 Az alkalmazás egy fitnesz program, melyhez az ötletet a Pokemon Go nevű játék adta. Ennek az alkalmazásnak szintén van egy olyan játékmódja, melyben a felhasználónak a valós tér különböző helyszíneire kell elmennie, hogy pontokat szerezzen, azonban itt a kritikus tényező az, hogy mennyire gyorsan jut el a helyszínre. Ezáltal a játékos ösztönözve van a futásra, így a sportolás játékká válik számára. A fő célközönség olyan aktívkorúak, akik nehezen veszik rá magukat a sportra, azonban nosztalgikusan gondolnak vissza a Pokemon játékokkal eltöltött gyerekkorukra.
