@@ -3,6 +3,8 @@
 ## Bemutatás
 Az alkalmazás egy fitnesz program, melyhez az ötletet a Pokemon Go nevű játék adta. Ennek az alkalmazásnak szintén van egy olyan játékmódja, melyben a felhasználónak a valós tér különböző helyszíneire kell elmennie, hogy pontokat szerezzen, azonban itt a kritikus tényező az, hogy mennyire gyorsan jut el a helyszínre. Ezáltal a játékos ösztönözve van a futásra, így a sportolás játékká válik számára. A fő célközönség olyan aktívkorúak, akik nehezen veszik rá magukat a sportra, azonban nosztalgikusan gondolnak vissza a Pokemon játékokkal eltöltött gyerekkorukra.
 
+<img src="https://github.com/molnarjozsef/FitnessGo/blob/master/screenshots/Picture1.png" width="320" height="593" /><img src="https://github.com/molnarjozsef/FitnessGo/blob/master/screenshots/Picture5.png" width="320" height="593" />
+
 ## Főbb funkciók
 Az alkalmazásban található egy GridView alapú főmenü, melyekből az alfunkciók indíthatók. Balról előhúzható egy drawer menü, melyben a belépett felhasználó információi láthatók, valamint a kijelentkezés lehetősége. Az alkalmazás egy login activityvel indít, melyből elérhető a regisztrációs activity is. A felhasználókezelés emailcím és jelszó alapján történik a Firebase Auth segítségével.
 
@@ -15,6 +17,8 @@ A felhasználó érdekében a véletlenül kisorsolt célkoordinátát az alkalm
 Egy másik, a főmenüből elérhető funkció a Leaderboard, azaz a ranglista, ahol az összes felhasználó közül a legjobbak neve és pontszáma jelenik meg, csökkenő sorrendben. Ez RecyclerView segítségével van megvalósítva.
 
 A harmadik, főmenüből elérhető funkció pedig a profilbeállítások, ahol a felhasználó kiválaszthatja azt a nevet, melyet a játék során használ, a drawer menüben is lát, valamint ez jelenik meg a többi felhasználó számára a ranglistán is a játékos elért pontszáma mellett.
+
+<img src="https://github.com/molnarjozsef/FitnessGo/blob/master/screenshots/Picture3.png" width="320" height="593" /><img src="https://github.com/molnarjozsef/FitnessGo/blob/master/screenshots/Picture4.png" width="320" height="593" />
 
 ## Felhasznált technológiák
 - Explicit Intent segítségével történő váltás a belépő, a regisztrációs és főmenü Activityk között
@@ -34,3 +38,5 @@ A harmadik, főmenüből elérhető funkció pedig a profilbeállítások, ahol 
 - NoboButton nevű 3rd party library segítségével elkészített szimbolikus grafikus gombok
 - Az aktuálisan következő célpont meghatározásához az alkalmazás a felhasználó pozíciójához képest egy adott távolságon belül kisorsol egy adott koordinátát, majd azt előbb Reverse Geocoding-olja, hogy megkapja a hozzá tartozó legközelebbi postacímet, majd pedig a postacímet Geocoding-olja, hogy a ténylegesen létező postacímhez tartozó koordináta legyen a célpont, ne pedig egy megközelíthetetlen terület (pl. Duna)
 - A pontszámításhoz olyan algoritmust használ, mely végén a pontok egyenesen arányosak a távolsággal és lineárisan csökkennek a kör közben eltelt idővel
+
+<img src="https://github.com/molnarjozsef/FitnessGo/blob/master/screenshots/Picture2.png" width="320" height="593" /><img src="https://github.com/molnarjozsef/FitnessGo/blob/master/screenshots/Picture6.png" width="320" height="593" />
