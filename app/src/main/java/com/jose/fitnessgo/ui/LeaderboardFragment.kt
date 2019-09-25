@@ -12,6 +12,7 @@ import com.jose.fitnessgo.LeaderboardEntry
 import com.jose.fitnessgo.MarginItemDecoration
 import com.jose.fitnessgo.R
 import com.jose.fitnessgo.adapter.LeaderboardAdapter
+import com.jose.fitnessgo.data.firebase.FirestoreHelper
 import kotlinx.android.synthetic.main.fragment_leaderboard.*
 
 
@@ -37,32 +38,22 @@ class LeaderboardFragment : Fragment() {
 
         val leaderboardEntries = hashMapOf<String, Int>()
 
-
         val leaderboardAdapter = LeaderboardAdapter()
 
-        db?.collection("users")
-                ?.get()
-                ?.addOnSuccessListener { result ->
-                    for (document in result) {
-                        leaderboardEntries[(document.get("name")
-                                ?: document.get("email")).toString().substringBefore('@')] =
-                                Integer.parseInt(document.get("points")?.toString() ?: "0")
+        FirestoreHelper.loadAllUsers(
+                { userProfiles ->
+                    for (user in userProfiles) {
+                        leaderboardEntries[user.name] = user.points
                     }
                     val leaderBoardResult = leaderboardEntries.toList().sortedByDescending { (_, value) -> value }.toMap()
-
                     for (entry in leaderBoardResult) {
                         leaderboardAdapter.addItem(LeaderboardEntry(entry.key, entry.value))
                     }
-
                     rvLeaderboard.adapter = leaderboardAdapter
-                }
-                ?.addOnFailureListener { exception ->
-                    Log.w("TAG_LEADERBOARD", "Error getting documents.", exception)
-                }
-                ?.addOnCompleteListener {
+                },
+                {
                     pbLeaderBoard.visibility = View.GONE
-                }
-
+                })
 
     }
 

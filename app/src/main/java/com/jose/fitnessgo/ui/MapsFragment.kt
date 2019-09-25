@@ -29,8 +29,9 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.jose.fitnessgo.R
+import com.jose.fitnessgo.data.firebase.FirebaseAuthHelper
+import com.jose.fitnessgo.data.firebase.FirestoreHelper
 import kotlinx.android.synthetic.main.fragment_maps.*
-import java.io.IOException
 import java.util.*
 
 class MapsFragment : Fragment() {
@@ -140,23 +141,15 @@ class MapsFragment : Fragment() {
      * updates the points in the userPoints variable of this activity
      */
     private fun loadPtsFromDb() {
-        db.collection("users")
-                .document(FirebaseAuth.getInstance().currentUser?.email.toString())
-                .get()
-                .addOnSuccessListener { document ->
-                    if (document?.get("points") != null) {
-                        userPoints = Integer.parseInt(document.get("points").toString())
+        FirebaseAuthHelper.currentUser()?.email.toString().let {
+            FirestoreHelper.loadUserData(
+                    it,
+                    { userProfile ->
+                        userPoints = userProfile.points
                         refreshUserPointsView(userPoints)
-                    } else {
-                        userPoints = 0
-                        refreshUserPointsView(userPoints)
-                        savePtsToDb()
-                    }
-
-                }
-                .addOnFailureListener { exception ->
-                    Log.w(TAG, "Error getting documents.", exception)
-                }
+                    },
+                    {})
+        }
     }
 
 
@@ -164,15 +157,9 @@ class MapsFragment : Fragment() {
      * Updates the "points" value in the user's Firestore document with the current points
      */
     fun savePtsToDb() {
-
-        val userPtsData = HashMap<String, Any>()
-        userPtsData["email"] = FirebaseAuth.getInstance().currentUser?.email.toString()
-        userPtsData["points"] = userPoints
-
-        db.collection("users")
-                .document(FirebaseAuth.getInstance().currentUser?.email.toString())
-                //?.add(user)
-                .update(userPtsData)
+        FirebaseAuthHelper.currentUser()?.email?.let {
+            FirestoreHelper.saveUserData(it, userPoints)
+        }
     }
 
 
@@ -310,7 +297,6 @@ class MapsFragment : Fragment() {
             lm.removeProximityAlert(proxPendIntent)
 
 
-
         } else {
             Snackbar.make(
                     clLayoutMapsFragment,
@@ -367,7 +353,7 @@ class MapsFragment : Fragment() {
         }
     }
 
-    fun roundFinished(){
+    fun roundFinished() {
         tvTargetAddress?.append("\n\n Destination reached!")
         val newPoints = calculateNewPoints(System.currentTimeMillis(), startTimeOfRound)
         userPoints += newPoints

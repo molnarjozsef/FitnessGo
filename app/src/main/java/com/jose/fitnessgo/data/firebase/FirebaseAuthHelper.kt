@@ -3,7 +3,7 @@ package com.jose.fitnessgo.data.firebase
 import com.google.firebase.auth.FirebaseAuth
 import io.reactivex.Completable
 
-class FirebaseSource {
+object FirebaseAuthHelper {
 
     private val firebaseAuth: FirebaseAuth by lazy {
         FirebaseAuth.getInstance()
