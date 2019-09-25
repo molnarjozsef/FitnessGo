@@ -11,9 +11,9 @@ import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v4.app.ActivityCompat
-import android.support.v4.app.Fragment
+import com.google.android.material.snackbar.Snackbar
+import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -223,7 +223,7 @@ class MapsFragment : Fragment() {
 
             targetLatLng = LatLng(addresses[0].latitude, addresses[0].longitude)
 
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             e.printStackTrace()
         }
 
