@@ -18,6 +18,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -26,8 +28,8 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.jose.fitnessgo.GameLogic
 import com.jose.fitnessgo.R
 import com.jose.fitnessgo.data.firebase.FirebaseAuthHelper
 import com.jose.fitnessgo.data.firebase.FirestoreHelper
@@ -39,24 +41,17 @@ class MapsFragment : Fragment() {
 
     private var mMap: GoogleMap? = null
     private var targetLatLng: LatLng? = null
-    private var userLocation: Location = Location(LocationManager.GPS_PROVIDER)
-    private lateinit var mFusedLocationProviderClient: FusedLocationProviderClient
-    private var distanceInMeters: Int = 1000000
-    private var startTimeOfRound = System.currentTimeMillis()
     private var pxr: AlertOnProximityReceiver? = null
-    private var proxIntent: Intent? = null
-    private var proxPendIntent: PendingIntent? = null
-    private val targetLocation = Location(LocationManager.GPS_PROVIDER)
-    private var userPoints: Int = 0
     private val filter = IntentFilter("com.jose.fitnessgo.ProximityAlert")
-    private val newTargetPointPenalty = 100
 
-
-    private lateinit var db: FirebaseFirestore
+    lateinit var viewModel: GameLogic
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        viewModel = ViewModelProviders.of(this).get(GameLogic::class.java)
+        viewModel.context = this.context!!
 
         pxr = AlertOnProximityReceiver()
         this.activity?.registerReceiver(pxr, filter)
@@ -75,43 +70,40 @@ class MapsFragment : Fragment() {
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync { onMapReady(it) }
 
-        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this.activity!!)
-        db = FirebaseFirestore.getInstance()
+        viewModel.fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this.activity!!)
 
-        loadPtsFromDb()
+        viewModel.loadPtsFromDb()
+        refreshUserPointsView(viewModel.userPoints)
 
-        getLastKnownLocation(oclNewTarget)
-
-
-
+        viewModel.getLastKnownLocation(oclNewTarget)
 
 
         btnNewTarget.setOnClickListener {
-            when (userPoints) {
-                in 0..newTargetPointPenalty -> {
+            when (viewModel.userPoints) {
+                in 0..viewModel.newTargetPointPenalty -> {
                     Snackbar.make(
                             clLayoutMapsFragment,
-                            "Not enough points. You need to have ${newTargetPointPenalty
-                                    - userPoints} more points to get a new target.",
+                            "Not enough points. You need to have ${viewModel.newTargetPointPenalty
+                                    - viewModel.userPoints} more points to get a new target.",
                             Snackbar.LENGTH_LONG
                     ).show()
                 }
                 else -> {
-                    userPoints -= newTargetPointPenalty
-                    refreshUserPointsView(userPoints)
-                    savePtsToDb()
-                    getLastKnownLocation(oclNewTarget)
+                    viewModel.userPoints -= viewModel.newTargetPointPenalty
+                    refreshUserPointsView(viewModel.userPoints)
+                    viewModel.savePtsToDb(viewModel.userPoints)
+                    viewModel.getLastKnownLocation(oclNewTarget)
                 }
 
             }
         }
 
         btnNextRound?.setOnClickListener {
-            getLastKnownLocation(oclNewTarget)
+            viewModel.getLastKnownLocation(oclNewTarget)
         }
 
         btnClaimPoints.setOnClickListener {
-            getLastKnownLocation(oclClaimPoints)
+            viewModel.getLastKnownLocation(oclClaimPoints)
         }
 
     }
@@ -119,47 +111,21 @@ class MapsFragment : Fragment() {
     override fun onResume() {
 
 
-        loadPtsFromDb()
+        viewModel.loadPtsFromDb()
+        refreshUserPointsView(viewModel.userPoints)
         super.onResume()
     }
 
     override fun onPause() {
-        savePtsToDb()
+        viewModel.savePtsToDb(viewModel.userPoints)
         super.onPause()
     }
 
     /**
      * Updates the TextView that shows the user points from the Integer parameter
      */
-    fun refreshUserPointsView(pts: Int) {
+    private fun refreshUserPointsView(pts: Int) {
         tvUserPoints.text = resources.getString(R.string._points, pts)
-    }
-
-
-    /**
-     * Loads the user points from the Firestore cloud database
-     * updates the points in the userPoints variable of this activity
-     */
-    private fun loadPtsFromDb() {
-        FirebaseAuthHelper.currentUser()?.email.toString().let {
-            FirestoreHelper.loadUserData(
-                    it,
-                    { userProfile ->
-                        userPoints = userProfile.points
-                        refreshUserPointsView(userPoints)
-                    },
-                    {})
-        }
-    }
-
-
-    /**
-     * Updates the "points" value in the user's Firestore document with the current points
-     */
-    fun savePtsToDb() {
-        FirebaseAuthHelper.currentUser()?.email?.let {
-            FirestoreHelper.saveUserData(it, userPoints)
-        }
     }
 
 
@@ -175,7 +141,6 @@ class MapsFragment : Fragment() {
     fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-
         if (ActivityCompat.checkSelfPermission(this.context!!, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat
                         .checkSelfPermission(this.context!!, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return
@@ -184,81 +149,19 @@ class MapsFragment : Fragment() {
 
     }
 
-    /**
-     * Requests the last known location of the device
-     * @param oclCallback
-     */
-    private fun getLastKnownLocation(oclCallback: OnCompleteListener<Location>) {
-        Log.d(TAG, "getLastKnownLocation: called.")
 
-        if (ActivityCompat.checkSelfPermission(this.context!!, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat
-                        .checkSelfPermission(this.context!!, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return
-        }
-        mFusedLocationProviderClient.lastLocation.addOnCompleteListener(oclCallback)
-    }
-
-    private fun newTargetLocation() {
-        targetLatLng = LatLng(userLocation.latitude - 0.0025 + Math.random() * 0.005,
-                userLocation.longitude - 0.0025 * 1.48 + Math.random() * 0.005 * 1.48)
-
-        val geocoder = Geocoder(this.activity, Locale.getDefault())
-
-        try {
-            val addresses = geocoder.getFromLocation(targetLatLng!!.latitude, targetLatLng!!.longitude, 1)
-            tvTargetAddress.text = addresses[0].getAddressLine(0)
-
-            targetLatLng = LatLng(addresses[0].latitude, addresses[0].longitude)
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        // Measuring the starting distance to the target
-        targetLocation.latitude = targetLatLng!!.latitude
-        targetLocation.longitude = targetLatLng!!.longitude
-        distanceInMeters = userLocation.distanceTo(targetLocation).toInt()
-        tvTargetAddress.append("\n" + getString(R.string.this_round_is) + " "
-                + distanceInMeters.toString() + " " + getString(R.string.meters))
-
-        startTimeOfRound = System.currentTimeMillis()
-
-        // Building the Proximity Alert
-        val lm = this.context!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        proxIntent = Intent("com.jose.fitnessgo.ProximityAlert")
-        proxPendIntent = PendingIntent
-                .getBroadcast(this.context, 0, proxIntent,
-                        PendingIntent.FLAG_CANCEL_CURRENT)
-        if (ActivityCompat.checkSelfPermission(this.context!!, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat
-                        .checkSelfPermission(this.context!!, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return
-        }
-        lm.removeProximityAlert(proxPendIntent)
-        lm.addProximityAlert(
-                targetLatLng!!.latitude,
-                targetLatLng!!.longitude,
-                100f,
-                -1,
-                proxPendIntent)
-
-
+    fun updateMap(targetLatLng: LatLng) {
         // Updating the map with the new location
         // And refocusing the view between the user and the target
         mMap!!.clear()
-        mMap!!.addMarker(MarkerOptions().position(targetLatLng!!)
+        mMap!!.addMarker(MarkerOptions().position(targetLatLng)
                 .title("This is where you should get, as fast as you can"))
         mMap!!.animateCamera(CameraUpdateFactory
                 .newLatLngZoom(LatLng(
-                        (targetLocation.latitude + userLocation.latitude) / 2,
-                        (targetLocation.longitude + userLocation.longitude) / 2),
+                        (targetLatLng.latitude + viewModel.userLocation.latitude) / 2,
+                        (targetLatLng.longitude + viewModel.userLocation.longitude) / 2),
                         16.0f))
 
-
-        // Re-enabling the Claim Points button, because the new location's points were not yet claimed
-        btnClaimPoints.isEnabled = true
-        btnNewTarget.isEnabled = true
-        // Making the nextround button gone
-        btnNextRound?.visibility = View.GONE
     }
 
 
@@ -266,20 +169,11 @@ class MapsFragment : Fragment() {
      * This function should be called when the user gets to the target location
      * It calculates the earned points, and gives it back
      */
-    internal fun calculateNewPoints(currentTime: Long, prevTime: Long): Int {
-
-        val timeTaken = currentTime - prevTime
 
 
-        var earnedPoints = (distanceInMeters * 5 - timeTaken / 1000).toDouble()
-        if (earnedPoints < 10) {
-            earnedPoints = 0.0
-        }
-
-        //Disabling the Claim Points button, because the points were already given to the user
-        btnClaimPoints.isEnabled = false
-        btnNewTarget.isEnabled = false
-        return earnedPoints.toInt()
+    private fun setLocationButtonsEnabled(isEnabled: Boolean) {
+        btnClaimPoints.isEnabled = isEnabled
+        btnNewTarget.isEnabled = isEnabled
     }
 
     /**
@@ -290,18 +184,18 @@ class MapsFragment : Fragment() {
      */
     private var oclClaimPoints: OnCompleteListener<Location> = OnCompleteListener { task ->
         if (task.isSuccessful) {
-            userLocation = task.result ?: userLocation
+            viewModel.userLocation = task.result ?: viewModel.userLocation
         }
-        if (userLocation.distanceTo(targetLocation) < EXPECTED_RANGE_TO_TARGET) {
+        if (viewModel.userLocation.distanceTo(viewModel.targetLocation) < EXPECTED_RANGE_TO_TARGET) {
             val lm = this.context!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-            lm.removeProximityAlert(proxPendIntent)
+            lm.removeProximityAlert(viewModel.proxPendIntent)
 
 
         } else {
             Snackbar.make(
                     clLayoutMapsFragment,
                     getString(R.string.not_close_enough) + " " +
-                            userLocation.distanceTo(targetLocation).toInt() + " " +
+                            viewModel.userLocation.distanceTo(viewModel.targetLocation).toInt() + " " +
                             getString(R.string._meters_still_to_go),
                     Snackbar.LENGTH_LONG).show()
         }
@@ -338,9 +232,17 @@ class MapsFragment : Fragment() {
      */
     private var oclNewTarget: OnCompleteListener<Location> = OnCompleteListener { task ->
         if (task.isSuccessful) {
-            userLocation = task.result ?: userLocation
+            viewModel.userLocation = task.result ?: viewModel.userLocation
         }
-        newTargetLocation()
+        val newTarget = viewModel.newTargetLocation()
+        tvTargetAddress.text = viewModel.targetAddress + "\n" + resources.getString(R.string.this_round_is) + " " + viewModel.distanceInMeters.toString() + " " + resources.getString(R.string.meters)
+
+        newTarget?.let { updateMap(newTarget) }
+
+        // Re-enabling the Claim Points button, because the new location's points were not yet claimed
+        setLocationButtonsEnabled(true)
+        // Making the nextround button gone
+        btnNextRound?.visibility = View.GONE
     }
 
 
@@ -354,14 +256,14 @@ class MapsFragment : Fragment() {
     }
 
     fun roundFinished() {
-        tvTargetAddress?.append("\n\n Destination reached!")
-        val newPoints = calculateNewPoints(System.currentTimeMillis(), startTimeOfRound)
-        userPoints += newPoints
-        tvUserPoints?.let { refreshUserPointsView(userPoints) }
-        savePtsToDb()
+
+        val newPoints = viewModel.gameRoundFinished()
+
+        setLocationButtonsEnabled(false)
+        tvUserPoints?.let { refreshUserPointsView(viewModel.userPoints) }
         showNewPointsSnackbar(newPoints)
         btnNextRound?.visibility = View.VISIBLE
-
+        tvTargetAddress?.append("\n\n Destination reached!")
     }
 
     companion object {

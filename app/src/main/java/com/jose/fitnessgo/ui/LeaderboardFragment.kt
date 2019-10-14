@@ -19,15 +19,6 @@ import kotlinx.android.synthetic.main.fragment_leaderboard.*
 class LeaderboardFragment : Fragment() {
 
 
-    private var db: FirebaseFirestore? = null
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        db = FirebaseFirestore.getInstance()
-
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         pbLeaderBoard.visibility = View.VISIBLE
@@ -63,21 +54,5 @@ class LeaderboardFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_leaderboard, container, false)
     }
 
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     *
-     *
-     * See the Android Training lesson [Communicating with Other Fragments]
-     * (http://developer.android.com/training/basics/fragments/communicating.html)
-     * for more information.
-     */
-    interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        fun onFragmentInteraction(uri: Uri)
-    }
 
 }
