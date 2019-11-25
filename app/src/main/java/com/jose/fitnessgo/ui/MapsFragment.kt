@@ -1,26 +1,20 @@
 package com.jose.fitnessgo.ui
 
 import android.Manifest
-import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
-import androidx.core.app.ActivityCompat
-import androidx.fragment.app.Fragment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
+import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
-import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -28,29 +22,25 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.firestore.FirebaseFirestore
-import com.jose.fitnessgo.GameLogic
+import com.google.android.material.snackbar.Snackbar
+import com.jose.fitnessgo.MapsViewModel
 import com.jose.fitnessgo.R
-import com.jose.fitnessgo.data.firebase.FirebaseAuthHelper
-import com.jose.fitnessgo.data.firebase.FirestoreHelper
 import kotlinx.android.synthetic.main.fragment_maps.*
-import java.util.*
 
 class MapsFragment : Fragment() {
 
 
     private var mMap: GoogleMap? = null
-    private var targetLatLng: LatLng? = null
     private var pxr: AlertOnProximityReceiver? = null
     private val filter = IntentFilter("com.jose.fitnessgo.ProximityAlert")
 
-    lateinit var viewModel: GameLogic
+    lateinit var viewModel: MapsViewModel
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel = ViewModelProviders.of(this).get(GameLogic::class.java)
+        viewModel = ViewModelProviders.of(this).get(MapsViewModel::class.java)
         viewModel.context = this.context!!
 
         pxr = AlertOnProximityReceiver()
@@ -138,7 +128,7 @@ class MapsFragment : Fragment() {
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
-    fun onMapReady(googleMap: GoogleMap) {
+    private fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
         if (ActivityCompat.checkSelfPermission(this.context!!, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat
@@ -150,7 +140,7 @@ class MapsFragment : Fragment() {
     }
 
 
-    fun updateMap(targetLatLng: LatLng) {
+    private fun updateMap(targetLatLng: LatLng) {
         // Updating the map with the new location
         // And refocusing the view between the user and the target
         mMap!!.clear()
@@ -186,10 +176,10 @@ class MapsFragment : Fragment() {
         if (task.isSuccessful) {
             viewModel.userLocation = task.result ?: viewModel.userLocation
         }
-        if (viewModel.userLocation.distanceTo(viewModel.targetLocation) < EXPECTED_RANGE_TO_TARGET) {
+        if (viewModel.isUserCloseEnough()) {
             val lm = this.context!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
             lm.removeProximityAlert(viewModel.proxPendIntent)
-
+            roundFinished()
 
         } else {
             Snackbar.make(
@@ -269,7 +259,7 @@ class MapsFragment : Fragment() {
     companion object {
 
         private const val TAG = "MAPS_ACTIVITY"
-        const val EXPECTED_RANGE_TO_TARGET = 100
+
     }
 
 }

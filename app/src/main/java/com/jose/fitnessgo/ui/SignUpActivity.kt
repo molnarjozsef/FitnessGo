@@ -2,33 +2,29 @@ package com.jose.fitnessgo.ui
 
 import android.content.Intent
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
-import androidx.appcompat.app.AppCompatActivity
 import android.util.Patterns
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProviders
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.FirebaseApp
-import com.google.firebase.auth.FirebaseAuth
 import com.jose.fitnessgo.R
 import kotlinx.android.synthetic.main.activity_sign_up.*
 
 class SignUpActivity : AppCompatActivity() {
 
-    var mAuth: FirebaseAuth? = null
+    private val viewModel by lazy { ViewModelProviders.of(this).get(SignUpViewModel::class.java) }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_up)
 
         FirebaseApp.initializeApp(applicationContext)
-
-        mAuth = FirebaseAuth.getInstance()
     }
 
-    fun signUpOnClick(view: View) {
-        registerUser()
-    }
 
-    private fun registerUser() {
+    private fun registerUser(view: View) {
         val email = etEmailSignUp.editText?.text.toString().trim()
         val password = etPasswordSignUp.editText?.text.toString().trim()
 
@@ -58,21 +54,22 @@ class SignUpActivity : AppCompatActivity() {
 
         pbSignUp.visibility = View.VISIBLE
 
-        mAuth?.createUserWithEmailAndPassword(email, password)
-                ?.addOnSuccessListener {
+        viewModel.registerUserInDb(email, password,
+                doOnSuccess = {
                     val loginIntent = Intent(this, MainActivity::class.java)
                     loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                    loginIntent.putExtra("KEY_MESSAGE","Registration successful")
+                    loginIntent.putExtra("KEfY_MESSAGE", "Registration successful")
                     startActivity(loginIntent)
-                }
-                ?.addOnFailureListener {
+                },
+                doOnFailure = {
                     Snackbar.make(clSignup, "Registration unsuccessful: " +
                             "${it.message}", Snackbar.LENGTH_LONG).show()
+                },
+                doOnComplete = {
+                    pbSignUp.visibility = View.GONE
 
                 }
-                ?.addOnCompleteListener {
-                    pbSignUp.visibility = View.GONE
-                }
+        )
 
 
     }

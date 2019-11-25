@@ -7,6 +7,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.google.firebase.firestore.FirebaseFirestore
 import com.jose.fitnessgo.LeaderboardEntry
 import com.jose.fitnessgo.MarginItemDecoration
@@ -18,6 +20,8 @@ import kotlinx.android.synthetic.main.fragment_leaderboard.*
 
 class LeaderboardFragment : Fragment() {
 
+    private val viewModel by lazy {ViewModelProviders.of(this).get(LeaderboardViewModel::class.java)}
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -26,25 +30,19 @@ class LeaderboardFragment : Fragment() {
         rvLeaderboard.addItemDecoration(MarginItemDecoration(
                 resources.getDimension(R.dimen.default_padding).toInt()))
 
-
-        val leaderboardEntries = hashMapOf<String, Int>()
-
         val leaderboardAdapter = LeaderboardAdapter()
 
-        FirestoreHelper.loadAllUsers(
-                { userProfiles ->
-                    for (user in userProfiles) {
-                        leaderboardEntries[user.name] = user.points
-                    }
-                    val leaderBoardResult = leaderboardEntries.toList().sortedByDescending { (_, value) -> value }.toMap()
-                    for (entry in leaderBoardResult) {
-                        leaderboardAdapter.addItem(LeaderboardEntry(entry.key, entry.value))
-                    }
-                    rvLeaderboard.adapter = leaderboardAdapter
-                },
-                {
-                    pbLeaderBoard.visibility = View.GONE
-                })
+        val leaderboardObserver = Observer<List<LeaderboardEntry>>{leaderBoardEntries ->
+            for (entry in leaderBoardEntries){
+                leaderboardAdapter.addItem(LeaderboardEntry(entry.name, entry.points))
+            }
+            rvLeaderboard.adapter = leaderboardAdapter
+        }
+
+        viewModel.leaderboardList.observe(this,leaderboardObserver)
+
+        viewModel.loadAllUsers { pbLeaderBoard.visibility = View.GONE }
+
 
     }
 

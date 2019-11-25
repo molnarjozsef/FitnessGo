@@ -6,38 +6,36 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Bundle
-import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.Snackbar
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.core.view.GravityCompat
-import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.view.GravityCompat
+import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.jose.fitnessgo.Constants.ERROR_DIALOG_REQUEST
 import com.jose.fitnessgo.Constants.PERMISSIONS_REQUEST_FINE_LOCATION
 import com.jose.fitnessgo.R.*
 import com.jose.fitnessgo.data.firebase.FirebaseAuthHelper
-import com.jose.fitnessgo.data.firebase.FirestoreHelper
 import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity() {
 
 
-    // Firebase, Firestore
-    private lateinit var db: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
 
+    val viewModel by lazy { ViewModelProviders.of(this).get(MainViewModel::class.java) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,7 +70,7 @@ class MainActivity : AppCompatActivity() {
 
         navigationView.setNavigationItemSelectedListener {
             if (it.itemId == id.nav_logout) {
-                auth.signOut()
+                viewModel.signOut()
                 startActivity(Intent(this, SignInActivity::class.java))
                 finish()
             }
@@ -84,7 +82,7 @@ class MainActivity : AppCompatActivity() {
         // If user profile is not found in the DB, user is added to the DB
 
 
-        FirestoreHelper.addIfNotAdded(FirebaseAuthHelper.currentUser()?.email.toString(),
+        viewModel.addUserIfNotAdded(
                 doOnSuccess = { userProfile ->
                     profileUserName.text = userProfile.name
                 },

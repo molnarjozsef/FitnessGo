@@ -80,7 +80,7 @@ object FirestoreHelper {
 
     fun addIfNotAdded(email: String, doOnSuccess: (UserProfile) -> Unit, doOnFailure:() -> Unit) {
         val db = FirebaseFirestore.getInstance()
-        val docRef = db.collection("users").document()
+        val docRef = db.collection("users").document(email)
         docRef.get()
                 .addOnSuccessListener { document ->
                     val user: UserProfile

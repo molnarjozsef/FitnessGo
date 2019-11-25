@@ -22,7 +22,7 @@ import kotlinx.android.synthetic.main.fragment_maps.*
 import org.kodein.di.generic.contextFinder
 import java.util.*
 
-class GameLogic: ViewModel() {
+class MapsViewModel: ViewModel() {
     lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     val newTargetPointPenalty = 100
     var userPoints: Int = 0
@@ -36,6 +36,10 @@ class GameLogic: ViewModel() {
 
     var proxIntent: Intent? = null
     var proxPendIntent: PendingIntent? = null
+
+    fun isUserCloseEnough(): Boolean{
+        return userLocation.distanceTo(targetLocation) < EXPECTED_RANGE_TO_TARGET
+    }
 
     fun calculateNewPoints(currentTime: Long, prevTime: Long, distanceInMeters: Int): Int {
 
@@ -57,7 +61,7 @@ class GameLogic: ViewModel() {
      * @param oclCallback
      */
     fun getLastKnownLocation(oclCallback: OnCompleteListener<Location>) {
-        Log.d("GameLogic", "getLastKnownLocation: called.")
+        Log.d("MapsViewModel", "getLastKnownLocation: called.")
 
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat
                         .checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -66,9 +70,6 @@ class GameLogic: ViewModel() {
         fusedLocationProviderClient.lastLocation.addOnCompleteListener(oclCallback)
     }
 
-    fun newTargetBtnClickListener(){
-
-    }
 
     /**
      * Loads the user points from the Firestore cloud database
@@ -147,6 +148,10 @@ class GameLogic: ViewModel() {
 
 
         return newTargetLatLng
+    }
+
+    companion object {
+        const val EXPECTED_RANGE_TO_TARGET = 100
     }
 
 }
