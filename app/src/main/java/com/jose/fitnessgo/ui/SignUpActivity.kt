@@ -21,10 +21,15 @@ class SignUpActivity : AppCompatActivity() {
         setContentView(R.layout.activity_sign_up)
 
         FirebaseApp.initializeApp(applicationContext)
+
+        btnSignUp.setOnClickListener {
+            registerUser()
+        }
+
     }
 
 
-    private fun registerUser(view: View) {
+    private fun registerUser() {
         val email = etEmailSignUp.editText?.text.toString().trim()
         val password = etPasswordSignUp.editText?.text.toString().trim()
 

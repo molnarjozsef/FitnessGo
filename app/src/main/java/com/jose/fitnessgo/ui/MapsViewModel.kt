@@ -1,7 +1,6 @@
-package com.jose.fitnessgo
+package com.jose.fitnessgo.ui
 
 import android.Manifest
-import android.app.Application
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -11,21 +10,23 @@ import android.location.Location
 import android.location.LocationManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.OnCompleteListener
 import com.jose.fitnessgo.data.firebase.FirebaseAuthHelper
 import com.jose.fitnessgo.data.firebase.FirestoreHelper
-import com.jose.fitnessgo.ui.MapsFragment
-import kotlinx.android.synthetic.main.fragment_maps.*
-import org.kodein.di.generic.contextFinder
+import kotlinx.coroutines.Job
 import java.util.*
 
-class MapsViewModel: ViewModel() {
+class MapsViewModel : ViewModel() {
+
     lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     val newTargetPointPenalty = 100
-    var userPoints: Int = 0
+    var userPointsLiveData = MutableLiveData<Int>()
+    var userPoints = 0
     var startTimeOfRound = System.currentTimeMillis()
     var distanceInMeters: Int = 1000000
     var targetAddress: String = ""
@@ -37,7 +38,7 @@ class MapsViewModel: ViewModel() {
     var proxIntent: Intent? = null
     var proxPendIntent: PendingIntent? = null
 
-    fun isUserCloseEnough(): Boolean{
+    fun isUserCloseEnough(): Boolean {
         return userLocation.distanceTo(targetLocation) < EXPECTED_RANGE_TO_TARGET
     }
 
@@ -81,6 +82,7 @@ class MapsViewModel: ViewModel() {
                     it,
                     { userProfile ->
                         userPoints = userProfile.points
+                        userPointsLiveData.postValue(userPoints)
                     },
                     {})
         }
@@ -100,6 +102,7 @@ class MapsViewModel: ViewModel() {
         val newPoints = calculateNewPoints(System.currentTimeMillis(), startTimeOfRound, distanceInMeters)
         userPoints += newPoints
         savePtsToDb(userPoints)
+        userPointsLiveData.postValue(userPoints)
         return newPoints
     }
 
@@ -119,6 +122,7 @@ class MapsViewModel: ViewModel() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+
 
         // Measuring the starting distance to the target
         targetLocation.latitude = newTargetLatLng.latitude

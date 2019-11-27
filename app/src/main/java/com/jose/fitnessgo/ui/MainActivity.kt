@@ -32,9 +32,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
-
-    private lateinit var auth: FirebaseAuth
-
     val viewModel by lazy { ViewModelProviders.of(this).get(MainViewModel::class.java) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,15 +55,12 @@ class MainActivity : AppCompatActivity() {
             Snackbar.make(drawer_layout, it, Snackbar.LENGTH_LONG).show()
         }
 
-
         // Showing email in the drawer header
         val navigationView: NavigationView = findViewById(id.nav_view)
         val headerView: View = navigationView.getHeaderView(0)
         val profileEmail: TextView = headerView.findViewById(id.tvUserEmail)
         val profileUserName: TextView = headerView.findViewById(id.tvUserName)
         profileEmail.text = FirebaseAuthHelper.currentUser()?.email.toString()
-
-
 
         navigationView.setNavigationItemSelectedListener {
             if (it.itemId == id.nav_logout) {
@@ -77,10 +71,8 @@ class MainActivity : AppCompatActivity() {
             return@setNavigationItemSelectedListener true
         }
 
-
         // Showing username in the drawer header if available
         // If user profile is not found in the DB, user is added to the DB
-
 
         viewModel.addUserIfNotAdded(
                 doOnSuccess = { userProfile ->
@@ -181,7 +173,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-
         private const val TAG = "MainActivity"
     }
 

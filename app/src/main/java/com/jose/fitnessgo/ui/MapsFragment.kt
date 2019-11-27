@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -23,7 +24,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.snackbar.Snackbar
-import com.jose.fitnessgo.MapsViewModel
 import com.jose.fitnessgo.R
 import kotlinx.android.synthetic.main.fragment_maps.*
 
@@ -55,6 +55,12 @@ class MapsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val userPointsObserver = Observer<Int>{userPoints ->
+            refreshUserPointsView(userPoints)
+        }
+
+        viewModel.userPointsLiveData.observe(this,userPointsObserver)
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
@@ -96,6 +102,11 @@ class MapsFragment : Fragment() {
             viewModel.getLastKnownLocation(oclClaimPoints)
         }
 
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.userPointsLiveData.removeObservers(this)
     }
 
     override fun onResume() {
@@ -224,6 +235,7 @@ class MapsFragment : Fragment() {
         if (task.isSuccessful) {
             viewModel.userLocation = task.result ?: viewModel.userLocation
         }
+
         val newTarget = viewModel.newTargetLocation()
         tvTargetAddress.text = viewModel.targetAddress + "\n" + resources.getString(R.string.this_round_is) + " " + viewModel.distanceInMeters.toString() + " " + resources.getString(R.string.meters)
 
