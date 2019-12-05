@@ -6,36 +6,33 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Bundle
-import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.Snackbar
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.core.view.GravityCompat
-import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.view.GravityCompat
+import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.jose.fitnessgo.Constants.ERROR_DIALOG_REQUEST
 import com.jose.fitnessgo.Constants.PERMISSIONS_REQUEST_FINE_LOCATION
 import com.jose.fitnessgo.R.*
+import com.jose.fitnessgo.data.firebase.FirebaseAuthHelper
 import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity() {
 
-
-    // Firebase, Firestore
-    private lateinit var db: FirebaseFirestore
-    private lateinit var auth: FirebaseAuth
-
+    val viewModel by lazy { ViewModelProviders.of(this).get(MainViewModel::class.java) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,51 +52,35 @@ class MainActivity : AppCompatActivity() {
         }
 
         intent.getStringExtra("KEY_MESSAGE")?.let {
-            Snackbar.make(drawer_layout,it, Snackbar.LENGTH_LONG).show()
+            Snackbar.make(drawer_layout, it, Snackbar.LENGTH_LONG).show()
         }
-
-
-        // Firebase, firestore instances
-        auth = FirebaseAuth.getInstance()
-        db = FirebaseFirestore.getInstance()
 
         // Showing email in the drawer header
         val navigationView: NavigationView = findViewById(id.nav_view)
-        val headerview: View = navigationView.getHeaderView(0)
-        val profileEmail: TextView = headerview.findViewById(id.tvUserEmail)
-        val profileUserName: TextView = headerview.findViewById(id.tvUserName)
-        profileEmail.text = auth.currentUser?.email.toString()
-
-
+        val headerView: View = navigationView.getHeaderView(0)
+        val profileEmail: TextView = headerView.findViewById(id.tvUserEmail)
+        val profileUserName: TextView = headerView.findViewById(id.tvUserName)
+        profileEmail.text = FirebaseAuthHelper.currentUser()?.email.toString()
 
         navigationView.setNavigationItemSelectedListener {
             if (it.itemId == id.nav_logout) {
-                auth.signOut()
+                viewModel.signOut()
                 startActivity(Intent(this, SignInActivity::class.java))
                 finish()
             }
             return@setNavigationItemSelectedListener true
         }
 
-
         // Showing username in the drawer header if available
         // If user profile is not found in the DB, user is added to the DB
 
-        val docRef = db.collection("users").document(FirebaseAuth.getInstance().currentUser?.email.toString())
-        docRef.get()
-                .addOnSuccessListener { document ->
-                    if (document.exists()) {
-                        profileUserName.text = (document.get("name") ?: " ").toString()
-                    } else {
-                        profileUserName.text = ""
-                        val user = HashMap<String, Any>()
-                        user["email"] = FirebaseAuth.getInstance().currentUser?.email.toString()
-                        db.collection("users").document(FirebaseAuth.getInstance().currentUser?.email.toString()).set(user)
-                    }
-                }
-                .addOnFailureListener {
+        viewModel.addUserIfNotAdded(
+                doOnSuccess = { userProfile ->
+                    profileUserName.text = userProfile.name
+                },
+                doOnFailure = {
                     Snackbar.make(drawer_layout, "Getting user data failed.", Snackbar.LENGTH_LONG).show()
-                }
+                })
     }
 
     override fun onResume() {
@@ -192,7 +173,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-
         private const val TAG = "MainActivity"
     }
 

@@ -1,32 +1,23 @@
 package com.jose.fitnessgo.ui
 
-import android.net.Uri
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.google.firebase.firestore.FirebaseFirestore
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.jose.fitnessgo.LeaderboardEntry
 import com.jose.fitnessgo.MarginItemDecoration
 import com.jose.fitnessgo.R
 import com.jose.fitnessgo.adapter.LeaderboardAdapter
-import com.jose.fitnessgo.data.firebase.FirestoreHelper
 import kotlinx.android.synthetic.main.fragment_leaderboard.*
 
 
 class LeaderboardFragment : Fragment() {
 
+    private val viewModel by lazy { ViewModelProviders.of(this).get(LeaderboardViewModel::class.java) }
 
-    private var db: FirebaseFirestore? = null
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        db = FirebaseFirestore.getInstance()
-
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -35,26 +26,25 @@ class LeaderboardFragment : Fragment() {
         rvLeaderboard.addItemDecoration(MarginItemDecoration(
                 resources.getDimension(R.dimen.default_padding).toInt()))
 
-
-        val leaderboardEntries = hashMapOf<String, Int>()
-
         val leaderboardAdapter = LeaderboardAdapter()
 
-        FirestoreHelper.loadAllUsers(
-                { userProfiles ->
-                    for (user in userProfiles) {
-                        leaderboardEntries[user.name] = user.points
-                    }
-                    val leaderBoardResult = leaderboardEntries.toList().sortedByDescending { (_, value) -> value }.toMap()
-                    for (entry in leaderBoardResult) {
-                        leaderboardAdapter.addItem(LeaderboardEntry(entry.key, entry.value))
-                    }
-                    rvLeaderboard.adapter = leaderboardAdapter
-                },
-                {
-                    pbLeaderBoard.visibility = View.GONE
-                })
+        val leaderboardObserver = Observer<List<LeaderboardEntry>> { leaderBoardEntries ->
+            for (entry in leaderBoardEntries) {
+                leaderboardAdapter.addItem(LeaderboardEntry(entry.name, entry.points))
+            }
+            rvLeaderboard.adapter = leaderboardAdapter
+        }
 
+        viewModel.leaderboardList.observe(this, leaderboardObserver)
+
+        viewModel.loadAllUsers { pbLeaderBoard.visibility = View.GONE }
+
+
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.leaderboardList.removeObservers(this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -63,21 +53,5 @@ class LeaderboardFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_leaderboard, container, false)
     }
 
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     *
-     *
-     * See the Android Training lesson [Communicating with Other Fragments]
-     * (http://developer.android.com/training/basics/fragments/communicating.html)
-     * for more information.
-     */
-    interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        fun onFragmentInteraction(uri: Uri)
-    }
 
 }

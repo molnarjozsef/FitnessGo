@@ -5,11 +5,9 @@ import io.reactivex.Completable
 
 object FirebaseAuthHelper {
 
-    private val firebaseAuth: FirebaseAuth by lazy {
-        FirebaseAuth.getInstance()
-    }
+    private val firebaseAuth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
 
-    fun login(email: String, password: String) = Completable.create{ emitter ->
+    fun login(email: String, password: String) = Completable.create { emitter ->
         firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
             if (!emitter.isDisposed) {
                 if (it.isSuccessful)
