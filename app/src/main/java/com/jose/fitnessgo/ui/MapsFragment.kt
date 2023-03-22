@@ -15,8 +15,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -27,6 +27,7 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.snackbar.Snackbar
 import com.jose.fitnessgo.R
 import com.ornach.nobobutton.NoboButton
+import kotlinx.coroutines.launch
 
 class MapsFragment : Fragment() {
 
@@ -56,11 +57,12 @@ class MapsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val userPointsObserver = Observer<Int> { userPoints ->
-            refreshUserPointsView(userPoints)
-        }
 
-        viewModel.userPointsLiveData.observe(this.viewLifecycleOwner, userPointsObserver)
+        lifecycleScope.launch {
+            viewModel.userPoints.collect { userPoints ->
+                refreshUserPointsView(userPoints)
+            }
+        }
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
@@ -68,28 +70,23 @@ class MapsFragment : Fragment() {
 
         viewModel.fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
-        viewModel.loadPtsFromDb()
-        refreshUserPointsView(viewModel.userPoints)
-
         viewModel.getLastKnownLocation(oclNewTarget, requireContext())
 
 
         view.findViewById<View>(R.id.btnNewTarget).setOnClickListener {
-            when (viewModel.userPoints) {
+            when (viewModel.userPoints.value) {
                 in 0..viewModel.newTargetPointPenalty -> {
                     Snackbar.make(
                         view.findViewById(R.id.clLayoutMapsFragment),
                         "Not enough points. You need to have ${
-                            viewModel.newTargetPointPenalty
-                                - viewModel.userPoints
+                            viewModel.newTargetPointPenalty - viewModel.userPoints.value
                         } more points to get a new target.",
                         Snackbar.LENGTH_LONG
                     ).show()
                 }
                 else -> {
-                    viewModel.userPoints -= viewModel.newTargetPointPenalty
-                    refreshUserPointsView(viewModel.userPoints)
-                    viewModel.savePtsToDb(viewModel.userPoints)
+                    viewModel.addToUserPoints(-viewModel.newTargetPointPenalty)
+                    viewModel.savePtsToDb()
                     viewModel.getLastKnownLocation(oclNewTarget, requireContext())
                 }
 
@@ -106,20 +103,8 @@ class MapsFragment : Fragment() {
 
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        viewModel.userPointsLiveData.removeObservers(this)
-    }
-
-    override fun onResume() {
-
-        viewModel.loadPtsFromDb()
-        refreshUserPointsView(viewModel.userPoints)
-        super.onResume()
-    }
-
     override fun onPause() {
-        viewModel.savePtsToDb(viewModel.userPoints)
+        viewModel.savePtsToDb()
         super.onPause()
     }
 
@@ -279,7 +264,6 @@ class MapsFragment : Fragment() {
         val newPoints = viewModel.gameRoundFinished()
 
         setLocationButtonsEnabled(false)
-        view?.findViewById<View>(R.id.tvUserPoints)?.let { refreshUserPointsView(viewModel.userPoints) }
         showNewPointsSnackbar(newPoints)
         view?.findViewById<View>(R.id.btnNextRound)?.visibility = View.VISIBLE
         view?.findViewById<TextView>(R.id.tvTargetAddress)?.append("\n\n Destination reached!")

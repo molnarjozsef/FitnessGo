@@ -10,21 +10,22 @@ import android.location.Location
 import android.location.LocationManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.OnCompleteListener
 import com.jose.fitnessgo.data.firebase.FirebaseAuthHelper
 import com.jose.fitnessgo.data.firebase.FirestoreHelper
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.util.Locale
 
 class MapsViewModel : ViewModel() {
 
     lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     val newTargetPointPenalty = 100
-    var userPointsLiveData = MutableLiveData<Int>()
-    var userPoints = 0
+    private val _userPoints = MutableStateFlow(0)
+    val userPoints: StateFlow<Int> = _userPoints
     var startTimeOfRound = System.currentTimeMillis()
     var distanceInMeters: Int = 1000000
     var targetAddress: String = ""
@@ -81,32 +82,31 @@ class MapsViewModel : ViewModel() {
      * Loads the user points from the Firestore cloud database
      * updates the points in the userPoints variable of this activity
      */
-    fun loadPtsFromDb() {
+    private fun loadPtsFromDb() {
         FirebaseAuthHelper.currentUser()?.email.toString().let {
             FirestoreHelper.loadUserData(
-                it,
-                { userProfile ->
-                    userPoints = userProfile.points
-                    userPointsLiveData.postValue(userPoints)
+                email = it,
+                doOnSuccess = { userProfile ->
+                    _userPoints.value = userProfile.points
                 },
-                {})
+                doOnComplete = {}
+            )
         }
     }
 
     /**
      * Updates the "points" value in the user's Firestore document with the current points
      */
-    fun savePtsToDb(points: Int) {
+    fun savePtsToDb() {
         FirebaseAuthHelper.currentUser()?.email?.let {
-            FirestoreHelper.saveUserData(it, points)
+            FirestoreHelper.saveUserData(it, _userPoints.value)
         }
     }
 
     fun gameRoundFinished(): Int {
         val newPoints = calculateNewPoints(System.currentTimeMillis(), startTimeOfRound, distanceInMeters)
-        userPoints += newPoints
-        savePtsToDb(userPoints)
-        userPointsLiveData.postValue(userPoints)
+        _userPoints.value += newPoints
+        savePtsToDb()
         return newPoints
     }
 
@@ -169,6 +169,14 @@ class MapsViewModel : ViewModel() {
 
 
         return newTargetLatLng
+    }
+
+    fun addToUserPoints(value: Int) {
+        _userPoints.value += value
+    }
+
+    init {
+        loadPtsFromDb()
     }
 
     companion object {
