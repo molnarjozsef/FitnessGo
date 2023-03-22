@@ -40,7 +40,6 @@ class MapsFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         viewModel = ViewModelProviders.of(this).get(MapsViewModel::class.java)
-        viewModel.context = this.requireContext()
 
         pxr = AlertOnProximityReceiver()
         this.activity?.registerReceiver(pxr, filter)
@@ -67,12 +66,12 @@ class MapsFragment : Fragment() {
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync { onMapReady(it) }
 
-        viewModel.fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this.activity!!)
+        viewModel.fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
         viewModel.loadPtsFromDb()
         refreshUserPointsView(viewModel.userPoints)
 
-        viewModel.getLastKnownLocation(oclNewTarget)
+        viewModel.getLastKnownLocation(oclNewTarget, requireContext())
 
 
         view.findViewById<View>(R.id.btnNewTarget).setOnClickListener {
@@ -91,18 +90,18 @@ class MapsFragment : Fragment() {
                     viewModel.userPoints -= viewModel.newTargetPointPenalty
                     refreshUserPointsView(viewModel.userPoints)
                     viewModel.savePtsToDb(viewModel.userPoints)
-                    viewModel.getLastKnownLocation(oclNewTarget)
+                    viewModel.getLastKnownLocation(oclNewTarget, requireContext())
                 }
 
             }
         }
 
         view.findViewById<View>(R.id.btnNextRound)?.setOnClickListener {
-            viewModel.getLastKnownLocation(oclNewTarget)
+            viewModel.getLastKnownLocation(oclNewTarget, requireContext())
         }
 
         view.findViewById<View>(R.id.btnClaimPoints).setOnClickListener {
-            viewModel.getLastKnownLocation(oclClaimPoints)
+            viewModel.getLastKnownLocation(oclClaimPoints, requireContext())
         }
 
     }
@@ -252,7 +251,7 @@ class MapsFragment : Fragment() {
             viewModel.userLocation = task.result ?: viewModel.userLocation
         }
 
-        val newTarget = viewModel.newTargetLocation()
+        val newTarget = viewModel.newTargetLocation(requireContext())
         view?.findViewById<TextView>(R.id.tvTargetAddress)?.text =
             viewModel.targetAddress + "\n" + resources.getString(R.string.this_round_is) + " " + viewModel.distanceInMeters.toString() + " " + resources.getString(
                 R.string.meters

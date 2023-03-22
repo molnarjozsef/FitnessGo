@@ -28,7 +28,6 @@ class MapsViewModel : ViewModel() {
     var startTimeOfRound = System.currentTimeMillis()
     var distanceInMeters: Int = 1000000
     var targetAddress: String = ""
-    lateinit var context: Context
 
     var userLocation: Location = Location(LocationManager.GPS_PROVIDER)
     val targetLocation = Location(LocationManager.GPS_PROVIDER)
@@ -58,7 +57,10 @@ class MapsViewModel : ViewModel() {
      * Requests the last known location of the device
      * @param oclCallback
      */
-    fun getLastKnownLocation(oclCallback: OnCompleteListener<Location>) {
+    fun getLastKnownLocation(
+        oclCallback: OnCompleteListener<Location>,
+        context: Context,
+    ) {
         Log.d("MapsViewModel", "getLastKnownLocation: called.")
 
         if (ActivityCompat.checkSelfPermission(
@@ -108,7 +110,9 @@ class MapsViewModel : ViewModel() {
         return newPoints
     }
 
-    fun newTargetLocation(): LatLng? {
+    fun newTargetLocation(
+        context: Context,
+    ): LatLng? {
         var newTargetLatLng = LatLng(
             userLocation.latitude - 0.0025 + Math.random() * 0.005,
             userLocation.longitude - 0.0025 * 1.48 + Math.random() * 0.005 * 1.48
