@@ -74,23 +74,18 @@ class MapsFragment : Fragment() {
 
 
         view.findViewById<View>(R.id.btnNewTarget).setOnClickListener {
-            when (viewModel.userPoints.value) {
-                in 0..viewModel.newTargetPointPenalty -> {
+            viewModel.tryGetNewPoint(
+                onSuccess = {
+                    viewModel.getLastKnownLocation(oclNewTarget, requireContext())
+                },
+                onNotEnoughPoints = { pointsNeeded ->
                     Snackbar.make(
                         view.findViewById(R.id.clLayoutMapsFragment),
-                        "Not enough points. You need to have ${
-                            viewModel.newTargetPointPenalty - viewModel.userPoints.value
-                        } more points to get a new target.",
+                        "Not enough points. You need to have $pointsNeeded more points to get a new target.",
                         Snackbar.LENGTH_LONG
                     ).show()
-                }
-                else -> {
-                    viewModel.addToUserPoints(-viewModel.newTargetPointPenalty)
-                    viewModel.savePtsToDb()
-                    viewModel.getLastKnownLocation(oclNewTarget, requireContext())
-                }
-
-            }
+                },
+            )
         }
 
         view.findViewById<View>(R.id.btnNextRound)?.setOnClickListener {

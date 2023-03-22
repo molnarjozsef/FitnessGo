@@ -23,7 +23,7 @@ import java.util.Locale
 class MapsViewModel : ViewModel() {
 
     lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    val newTargetPointPenalty = 100
+
     private val _userPoints = MutableStateFlow(0)
     val userPoints: StateFlow<Int> = _userPoints
     var startTimeOfRound = System.currentTimeMillis()
@@ -37,7 +37,7 @@ class MapsViewModel : ViewModel() {
     var proxPendIntent: PendingIntent? = null
 
     fun isUserCloseEnough(): Boolean {
-        return userLocation.distanceTo(targetLocation) < EXPECTED_RANGE_TO_TARGET
+        return userLocation.distanceTo(targetLocation) < ExpectedRangeToTarget
     }
 
     fun calculateNewPoints(currentTime: Long, prevTime: Long, distanceInMeters: Int): Int {
@@ -162,7 +162,7 @@ class MapsViewModel : ViewModel() {
         lm.addProximityAlert(
             newTargetLatLng.latitude,
             newTargetLatLng.longitude,
-            100f,
+            ExpectedRangeToTarget.toFloat(),
             -1,
             proxPendIntent!!
         )
@@ -171,16 +171,23 @@ class MapsViewModel : ViewModel() {
         return newTargetLatLng
     }
 
-    fun addToUserPoints(value: Int) {
-        _userPoints.value += value
+    fun tryGetNewPoint(
+        onSuccess: () -> Unit,
+        onNotEnoughPoints: (Int) -> Unit,
+    ) {
+        if (userPoints.value < NewTargetPointPenalty) {
+            onNotEnoughPoints(NewTargetPointPenalty - userPoints.value)
+        } else {
+            _userPoints.value -= NewTargetPointPenalty
+            savePtsToDb()
+            onSuccess()
+        }
     }
 
     init {
         loadPtsFromDb()
     }
-
-    companion object {
-        const val EXPECTED_RANGE_TO_TARGET = 100
-    }
-
 }
+
+private const val NewTargetPointPenalty = 100
+private const val ExpectedRangeToTarget = 100
