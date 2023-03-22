@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -25,10 +26,9 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.snackbar.Snackbar
 import com.jose.fitnessgo.R
-import kotlinx.android.synthetic.main.fragment_maps.*
+import com.ornach.nobobutton.NoboButton
 
 class MapsFragment : Fragment() {
-
 
     private var mMap: GoogleMap? = null
     private var pxr: AlertOnProximityReceiver? = null
@@ -36,19 +36,20 @@ class MapsFragment : Fragment() {
 
     lateinit var viewModel: MapsViewModel
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         viewModel = ViewModelProviders.of(this).get(MapsViewModel::class.java)
-        viewModel.context = this.context!!
+        viewModel.context = this.requireContext()
 
         pxr = AlertOnProximityReceiver()
         this.activity?.registerReceiver(pxr, filter)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_maps, container, false)
     }
@@ -56,11 +57,11 @@ class MapsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val userPointsObserver = Observer<Int>{userPoints ->
+        val userPointsObserver = Observer<Int> { userPoints ->
             refreshUserPointsView(userPoints)
         }
 
-        viewModel.userPointsLiveData.observe(this,userPointsObserver)
+        viewModel.userPointsLiveData.observe(this.viewLifecycleOwner, userPointsObserver)
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
@@ -74,14 +75,16 @@ class MapsFragment : Fragment() {
         viewModel.getLastKnownLocation(oclNewTarget)
 
 
-        btnNewTarget.setOnClickListener {
+        view.findViewById<View>(R.id.btnNewTarget).setOnClickListener {
             when (viewModel.userPoints) {
                 in 0..viewModel.newTargetPointPenalty -> {
                     Snackbar.make(
-                            clLayoutMapsFragment,
-                            "Not enough points. You need to have ${viewModel.newTargetPointPenalty
-                                    - viewModel.userPoints} more points to get a new target.",
-                            Snackbar.LENGTH_LONG
+                        view.findViewById(R.id.clLayoutMapsFragment),
+                        "Not enough points. You need to have ${
+                            viewModel.newTargetPointPenalty
+                                - viewModel.userPoints
+                        } more points to get a new target.",
+                        Snackbar.LENGTH_LONG
                     ).show()
                 }
                 else -> {
@@ -94,11 +97,11 @@ class MapsFragment : Fragment() {
             }
         }
 
-        btnNextRound?.setOnClickListener {
+        view.findViewById<View>(R.id.btnNextRound)?.setOnClickListener {
             viewModel.getLastKnownLocation(oclNewTarget)
         }
 
-        btnClaimPoints.setOnClickListener {
+        view.findViewById<View>(R.id.btnClaimPoints).setOnClickListener {
             viewModel.getLastKnownLocation(oclClaimPoints)
         }
 
@@ -110,7 +113,6 @@ class MapsFragment : Fragment() {
     }
 
     override fun onResume() {
-
 
         viewModel.loadPtsFromDb()
         refreshUserPointsView(viewModel.userPoints)
@@ -126,9 +128,8 @@ class MapsFragment : Fragment() {
      * Updates the TextView that shows the user points from the Integer parameter
      */
     private fun refreshUserPointsView(pts: Int) {
-        tvUserPoints.text = resources.getString(R.string._points, pts)
+        view?.findViewById<TextView>(R.id.tvUserPoints)?.text = resources.getString(R.string._points, pts)
     }
-
 
     /**
      * Manipulates the map once available.
@@ -142,39 +143,50 @@ class MapsFragment : Fragment() {
     private fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        if (ActivityCompat.checkSelfPermission(this.context!!, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat
-                        .checkSelfPermission(this.context!!, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat
+                .checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+        ) {
             return
         }
         mMap!!.isMyLocationEnabled = true
 
     }
 
-
     private fun updateMap(targetLatLng: LatLng) {
         // Updating the map with the new location
         // And refocusing the view between the user and the target
         mMap!!.clear()
-        mMap!!.addMarker(MarkerOptions().position(targetLatLng)
-                .title("This is where you should get, as fast as you can"))
-        mMap!!.animateCamera(CameraUpdateFactory
-                .newLatLngZoom(LatLng(
+        mMap!!.addMarker(
+            MarkerOptions().position(targetLatLng)
+                .title("This is where you should get, as fast as you can")
+        )
+        mMap!!.animateCamera(
+            CameraUpdateFactory
+                .newLatLngZoom(
+                    LatLng(
                         (targetLatLng.latitude + viewModel.userLocation.latitude) / 2,
-                        (targetLatLng.longitude + viewModel.userLocation.longitude) / 2),
-                        16.0f))
+                        (targetLatLng.longitude + viewModel.userLocation.longitude) / 2
+                    ),
+                    16.0f
+                )
+        )
 
     }
-
 
     /**
      * This function should be called when the user gets to the target location
      * It calculates the earned points, and gives it back
      */
 
-
     private fun setLocationButtonsEnabled(isEnabled: Boolean) {
-        btnClaimPoints.isEnabled = isEnabled
-        btnNewTarget.isEnabled = isEnabled
+        view?.findViewById<NoboButton>(R.id.btnClaimPoints)?.isEnabled = isEnabled
+        view?.findViewById<NoboButton>(R.id.btnNewTarget)?.isEnabled = isEnabled
     }
 
     /**
@@ -188,17 +200,18 @@ class MapsFragment : Fragment() {
             viewModel.userLocation = task.result ?: viewModel.userLocation
         }
         if (viewModel.isUserCloseEnough()) {
-            val lm = this.context!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-            lm.removeProximityAlert(viewModel.proxPendIntent)
+            val lm = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            lm.removeProximityAlert(viewModel.proxPendIntent!!)
             roundFinished()
 
         } else {
             Snackbar.make(
-                    clLayoutMapsFragment,
-                    getString(R.string.not_close_enough) + " " +
-                            viewModel.userLocation.distanceTo(viewModel.targetLocation).toInt() + " " +
-                            getString(R.string._meters_still_to_go),
-                    Snackbar.LENGTH_LONG).show()
+                requireView().findViewById(R.id.clLayoutMapsFragment),
+                getString(R.string.not_close_enough) + " " +
+                    viewModel.userLocation.distanceTo(viewModel.targetLocation).toInt() + " " +
+                    getString(R.string._meters_still_to_go),
+                Snackbar.LENGTH_LONG
+            ).show()
         }
 
     }
@@ -207,21 +220,24 @@ class MapsFragment : Fragment() {
         when (newPoints) {
             0 -> {
                 Snackbar.make(
-                        clLayoutMapsFragment,
-                        getString(R.string.congratulations_zero_points),
-                        Snackbar.LENGTH_LONG).show()
+                    requireView().findViewById(R.id.clLayoutMapsFragment),
+                    getString(R.string.congratulations_zero_points),
+                    Snackbar.LENGTH_LONG
+                ).show()
             }
             1 -> {
                 Snackbar.make(
-                        clLayoutMapsFragment,
-                        getString(R.string.congratulations_one_point),
-                        Snackbar.LENGTH_LONG).show()
+                    requireView().findViewById(R.id.clLayoutMapsFragment),
+                    getString(R.string.congratulations_one_point),
+                    Snackbar.LENGTH_LONG
+                ).show()
             }
             else -> {
                 Snackbar.make(
-                        clLayoutMapsFragment,
-                        getString(R.string.congratulations_you_scored__points, newPoints),
-                        Snackbar.LENGTH_LONG).show()
+                    requireView().findViewById(R.id.clLayoutMapsFragment),
+                    getString(R.string.congratulations_you_scored__points, newPoints),
+                    Snackbar.LENGTH_LONG
+                ).show()
             }
         }
     }
@@ -237,16 +253,18 @@ class MapsFragment : Fragment() {
         }
 
         val newTarget = viewModel.newTargetLocation()
-        tvTargetAddress.text = viewModel.targetAddress + "\n" + resources.getString(R.string.this_round_is) + " " + viewModel.distanceInMeters.toString() + " " + resources.getString(R.string.meters)
+        view?.findViewById<TextView>(R.id.tvTargetAddress)?.text =
+            viewModel.targetAddress + "\n" + resources.getString(R.string.this_round_is) + " " + viewModel.distanceInMeters.toString() + " " + resources.getString(
+                R.string.meters
+            )
 
         newTarget?.let { updateMap(newTarget) }
 
         // Re-enabling the Claim Points button, because the new location's points were not yet claimed
         setLocationButtonsEnabled(true)
         // Making the nextround button gone
-        btnNextRound?.visibility = View.GONE
+        view?.findViewById<View>(R.id.btnNextRound)?.visibility = View.GONE
     }
-
 
     /**
      * A BroadcastReceiver for the Proximity alert PendingIntent
@@ -262,10 +280,10 @@ class MapsFragment : Fragment() {
         val newPoints = viewModel.gameRoundFinished()
 
         setLocationButtonsEnabled(false)
-        tvUserPoints?.let { refreshUserPointsView(viewModel.userPoints) }
+        view?.findViewById<View>(R.id.tvUserPoints)?.let { refreshUserPointsView(viewModel.userPoints) }
         showNewPointsSnackbar(newPoints)
-        btnNextRound?.visibility = View.VISIBLE
-        tvTargetAddress?.append("\n\n Destination reached!")
+        view?.findViewById<View>(R.id.btnNextRound)?.visibility = View.VISIBLE
+        view?.findViewById<TextView>(R.id.tvTargetAddress)?.append("\n\n Destination reached!")
     }
 
     companion object {

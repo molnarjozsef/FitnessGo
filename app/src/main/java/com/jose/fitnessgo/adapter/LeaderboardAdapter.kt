@@ -10,7 +10,6 @@ import android.widget.TextView
 import android.widget.Toast
 import com.jose.fitnessgo.LeaderboardEntry
 import com.jose.fitnessgo.R
-import kotlinx.android.synthetic.main.row_leaderboard.view.*
 
 class LeaderboardAdapter : RecyclerView.Adapter<LeaderboardAdapter.ViewHolder>() {
 
@@ -53,8 +52,8 @@ class LeaderboardAdapter : RecyclerView.Adapter<LeaderboardAdapter.ViewHolder>()
 
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val tvEntryName: TextView = itemView.tvEntryName
-        val tvEntryPoints: TextView = itemView.tvEntryPoints
+        val tvEntryName: TextView = itemView.findViewById(R.id.tvEntryName)
+        val tvEntryPoints: TextView = itemView.findViewById(R.id.tvEntryPoints)
 
         var entry: LeaderboardEntry? = null
 

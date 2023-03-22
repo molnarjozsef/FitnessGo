@@ -17,18 +17,16 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.auth.FirebaseAuth
 import com.jose.fitnessgo.Constants.ERROR_DIALOG_REQUEST
 import com.jose.fitnessgo.Constants.PERMISSIONS_REQUEST_FINE_LOCATION
-import com.jose.fitnessgo.R.*
+import com.jose.fitnessgo.R
 import com.jose.fitnessgo.data.firebase.FirebaseAuthHelper
-import kotlinx.android.synthetic.main.activity_main.*
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,34 +34,38 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(layout.activity_main)
-        val toolbar = findViewById<Toolbar>(id.toolbar)
+        setContentView(R.layout.activity_main)
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        val toggle = ActionBarDrawerToggle(this, drawer_layout, toolbar,
-                string.navigation_drawer_open, string.navigation_drawer_close)
-        drawer_layout.addDrawerListener(toggle)
+        val toggle = ActionBarDrawerToggle(
+            this, findViewById(R.id.drawer_layout), toolbar,
+            R.string.navigation_drawer_open, R.string.navigation_drawer_close
+        )
+        findViewById<DrawerLayout>(R.id.drawer_layout).addDrawerListener(toggle)
         toggle.syncState()
 
         if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction().replace(id.fragment_container,
-                    HomeFragment()).commit()
+            supportFragmentManager.beginTransaction().replace(
+                R.id.fragment_container,
+                HomeFragment()
+            ).commit()
             //navigationView.setCheckedItem(com.jose.fitnessgo.R.id.nav_message)
         }
 
         intent.getStringExtra("KEY_MESSAGE")?.let {
-            Snackbar.make(drawer_layout, it, Snackbar.LENGTH_LONG).show()
+            Snackbar.make(findViewById(R.id.drawer_layout), it, Snackbar.LENGTH_LONG).show()
         }
 
         // Showing email in the drawer header
-        val navigationView: NavigationView = findViewById(id.nav_view)
+        val navigationView: NavigationView = findViewById(R.id.nav_view)
         val headerView: View = navigationView.getHeaderView(0)
-        val profileEmail: TextView = headerView.findViewById(id.tvUserEmail)
-        val profileUserName: TextView = headerView.findViewById(id.tvUserName)
+        val profileEmail: TextView = headerView.findViewById(R.id.tvUserEmail)
+        val profileUserName: TextView = headerView.findViewById(R.id.tvUserName)
         profileEmail.text = FirebaseAuthHelper.currentUser()?.email.toString()
 
         navigationView.setNavigationItemSelectedListener {
-            if (it.itemId == id.nav_logout) {
+            if (it.itemId == R.id.nav_logout) {
                 viewModel.signOut()
                 startActivity(Intent(this, SignInActivity::class.java))
                 finish()
@@ -75,12 +77,12 @@ class MainActivity : AppCompatActivity() {
         // If user profile is not found in the DB, user is added to the DB
 
         viewModel.addUserIfNotAdded(
-                doOnSuccess = { userProfile ->
-                    profileUserName.text = userProfile.name
-                },
-                doOnFailure = {
-                    Snackbar.make(drawer_layout, "Getting user data failed.", Snackbar.LENGTH_LONG).show()
-                })
+            doOnSuccess = { userProfile ->
+                profileUserName.text = userProfile.name
+            },
+            doOnFailure = {
+                Snackbar.make(findViewById(R.id.drawer_layout), "Getting user data failed.", Snackbar.LENGTH_LONG).show()
+            })
     }
 
     override fun onResume() {
@@ -92,13 +94,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
+        val drawer_layout = findViewById<DrawerLayout>(R.id.drawer_layout)
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
         } else {
             super.onBackPressed()
         }
     }
-
 
     /**
      * Checks for Google Play services on the current device
@@ -119,14 +121,14 @@ class MainActivity : AppCompatActivity() {
                 }
                 GoogleApiAvailability.getInstance().isUserResolvableError(available) -> {
                     Log.d(TAG, "isServicesOK: an error occured but we can fix it")
-                    val dialog = GoogleApiAvailability.getInstance().getErrorDialog(this@MainActivity, available, ERROR_DIALOG_REQUEST)
-                    dialog.show()
+                    val dialog = GoogleApiAvailability.getInstance()
+                        .getErrorDialog(this@MainActivity, available, ERROR_DIALOG_REQUEST)
+                    dialog!!.show()
                 }
                 else -> Toast.makeText(this, "You can't make map requests", Toast.LENGTH_SHORT).show()
             }
             return false
         }
-
 
     /**
      * Checks if GPS location is enabled on the current device
@@ -143,16 +145,21 @@ class MainActivity : AppCompatActivity() {
             return true
         }
 
-
     /**
      * Checks for fine location access permission, and requests if not yet granted
      */
     private fun checkRequestLocationPermission() {
-        if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                this@MainActivity,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
 
-            ActivityCompat.requestPermissions(this@MainActivity,
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                    PERMISSIONS_REQUEST_FINE_LOCATION)
+            ActivityCompat.requestPermissions(
+                this@MainActivity,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                PERMISSIONS_REQUEST_FINE_LOCATION
+            )
         }
     }
 
@@ -163,11 +170,11 @@ class MainActivity : AppCompatActivity() {
     private fun buildAlertMessageNoGps() {
         val builder = AlertDialog.Builder(this)
         builder.setMessage("This application requires active GPS to work properly.")
-                .setCancelable(false)
-                .setPositiveButton("Open GPS settings") { _, _ ->
-                    val enableGpsIntent = Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-                    startActivity(enableGpsIntent)
-                }
+            .setCancelable(false)
+            .setPositiveButton("Open GPS settings") { _, _ ->
+                val enableGpsIntent = Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                startActivity(enableGpsIntent)
+            }
         val alert = builder.create()
         alert.show()
     }

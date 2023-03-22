@@ -4,12 +4,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Patterns
 import android.view.View
+import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputLayout
 import com.jose.fitnessgo.R
-import kotlinx.android.synthetic.main.activity_sign_in.*
-
 
 class SignInActivity : AppCompatActivity() {
 
@@ -19,18 +19,24 @@ class SignInActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_in)
 
-        btnSignIn.setOnClickListener {
+        findViewById<View>(R.id.btnSignIn).setOnClickListener {
             userLogin()
         }
 
-        tvGotoSignUp.setOnClickListener {
+        findViewById<View>(R.id.tvGotoSignUp).setOnClickListener {
             startActivity(Intent(this, SignUpActivity::class.java))
         }
     }
 
     private fun userLogin() {
+        val etEmailSignIn = findViewById<TextInputLayout>(R.id.etEmailSignIn)
+        val etPasswordSignIn = findViewById<TextInputLayout>(R.id.etPasswordSignIn)
+        val pbSignIn = findViewById<ProgressBar>(R.id.pbSignIn)
+        val clSignin = findViewById<View>(R.id.clSignin)
+
         val email = etEmailSignIn.editText?.text.toString().trim()
         val password = etPasswordSignIn.editText?.text.toString().trim()
+
 
         if (email.isEmpty()) {
             etEmailSignIn.error = getString(R.string.email_is_required)
@@ -59,19 +65,21 @@ class SignInActivity : AppCompatActivity() {
         pbSignIn.visibility = View.VISIBLE
 
         viewModel.logInUser(email, password,
-                doOnSuccess = {
-                    val loginIntent = Intent(this, MainActivity::class.java)
-                    loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                    loginIntent.putExtra("KEY_MESSAGE", "Login successful")
-                    startActivity(loginIntent)
-                },
-                doOnFailure = {
-                    Snackbar.make(clSignin, "Login unsuccessful: " +
-                            "${it.message}", Snackbar.LENGTH_LONG).show()
-                },
-                doOnComplete = {
-                    pbSignIn.visibility = View.GONE
-                })
+            doOnSuccess = {
+                val loginIntent = Intent(this, MainActivity::class.java)
+                loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                loginIntent.putExtra("KEY_MESSAGE", "Login successful")
+                startActivity(loginIntent)
+            },
+            doOnFailure = {
+                Snackbar.make(
+                    clSignin, "Login unsuccessful: " +
+                        "${it.message}", Snackbar.LENGTH_LONG
+                ).show()
+            },
+            doOnComplete = {
+                pbSignIn.visibility = View.GONE
+            })
     }
 
 }

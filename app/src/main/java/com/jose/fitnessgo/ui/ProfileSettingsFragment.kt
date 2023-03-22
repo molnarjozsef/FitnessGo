@@ -11,18 +11,16 @@ import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.jose.fitnessgo.R
-import kotlinx.android.synthetic.main.fragment_profile_settings.*
-
 
 class ProfileSettingsFragment : Fragment() {
-
 
     private val viewModel by lazy { ViewModelProviders.of(this).get(ProfileSettingsViewModel::class.java) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val etUsername = view.findViewById<TextView>(R.id.etUsername)
 
-        btnSetUserName.setOnClickListener {
+        view.findViewById<View>(R.id.btnSetUserName).setOnClickListener {
             val user = HashMap<String, Any>()
             user["email"] = FirebaseAuth.getInstance().currentUser?.email.toString()
             user["name"] = etUsername.text.toString()
@@ -43,11 +41,12 @@ class ProfileSettingsFragment : Fragment() {
 
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_profile_settings, container, false)
     }
-
 
 }

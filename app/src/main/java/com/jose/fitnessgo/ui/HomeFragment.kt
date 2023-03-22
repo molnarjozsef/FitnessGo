@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.jose.fitnessgo.R
-import kotlinx.android.synthetic.main.fragment_home.*
 
 class HomeFragment : Fragment() {
 
@@ -15,26 +14,26 @@ class HomeFragment : Fragment() {
     }
 
     override fun onStart() {
-        cvGameStart.setOnClickListener {
+        view?.findViewById<View>(R.id.cvGameStart)?.setOnClickListener {
             activity?.supportFragmentManager
-                    ?.beginTransaction()
-                    ?.addToBackStack(null)
-                    ?.replace(R.id.fragment_container, MapsFragment())
-                    ?.commit()
+                ?.beginTransaction()
+                ?.addToBackStack(null)
+                ?.replace(R.id.fragment_container, MapsFragment())
+                ?.commit()
         }
-        cvLeaderBoard.setOnClickListener {
+        view?.findViewById<View>(R.id.cvLeaderBoard)?.setOnClickListener {
             activity?.supportFragmentManager
-                    ?.beginTransaction()
-                    ?.addToBackStack(null)
-                    ?.replace(R.id.fragment_container, LeaderboardFragment())
-                    ?.commit()
+                ?.beginTransaction()
+                ?.addToBackStack(null)
+                ?.replace(R.id.fragment_container, LeaderboardFragment())
+                ?.commit()
         }
-        cvProfileSettings.setOnClickListener {
+        view?.findViewById<View>(R.id.cvProfileSettings)?.setOnClickListener {
             activity?.supportFragmentManager
-                    ?.beginTransaction()
-                    ?.addToBackStack(null)
-                    ?.replace(R.id.fragment_container, ProfileSettingsFragment())
-                    ?.commit()
+                ?.beginTransaction()
+                ?.addToBackStack(null)
+                ?.replace(R.id.fragment_container, ProfileSettingsFragment())
+                ?.commit()
         }
 
         super.onStart()
